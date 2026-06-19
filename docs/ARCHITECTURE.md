@@ -42,16 +42,44 @@ Responses: `{ ok: true, message }` (200) · `{ ok: false, error, message }` with
 
 ## Lead backend — ports & adapters (`lib/leads/`)
 
-One interface, swappable implementations, chosen by the `LEAD_BACKEND` env var. **Runs fully locally with zero accounts.**
+One interface, swappable implementations, chosen by the `LEAD_BACKEND` env var. **Order matters — the FIRST adapter is the durable primary (its write must succeed); the rest are best-effort.**
 
 - `store.ts` — `LeadStore` interface (`save`, `list`) + `makeId()`
-- `local.ts` — **LocalStore** (SQLite at `data/leads.db`; default; always included as the durable audit copy)
+- `local.ts` — **LocalStore** (SQLite at `data/leads.db`). **Dev/QA only** — `better-sqlite3` cannot write on a serverless (read-only) filesystem, so it is **never used in production**. Opt in explicitly via `LEAD_BACKEND=local`; it is *not* auto-included.
+- `supabase.ts` — **SupabaseStore** (Postgres via PostgREST HTTPS; serverless-safe; the **production primary / source-of-truth**). Uses `NEXT_PUBLIC_SUPABASE_URL` + server-only `SUPABASE_SECRET_KEY`; no-ops safely if unset.
 - `klaviyo.ts` — **KlaviyoStore** (profile-import + list subscribe; no-ops safely if `KLAVIYO_API_KEY` unset)
 - `airtable.ts` — **AirtableStore** (raw row append; no-ops safely if creds unset)
 - `multi.ts` — **MultiStore** (fan-out; primary write must succeed, rest best-effort)
-- `factory.ts` — `getLeadStore()` builds from `LEAD_BACKEND` (`local` default; `klaviyo+airtable` for prod). LocalStore is always primary so a lead is never lost.
+- `factory.ts` — `getLeadStore()` builds from `LEAD_BACKEND` (`local` default for dev; **`supabase+klaviyo` for prod**). Builds only the adapters named in the spec, in order.
 
-See captured leads at `/admin?token=dev`; export via `npm run leads:export` (CSV = retailer demand / Klaviyo import).
+> ⚠️ **Why this matters:** an earlier version always forced LocalStore as the primary, which 500'd every submit on Vercel (read-only FS). Production **must** set `LEAD_BACKEND` to a serverless-safe primary (`supabase`).
+
+**Supabase `leads` table** (run once in the SQL editor; columns mirror the SQLite schema in `local.ts`):
+
+```sql
+create table if not exists public.leads (
+  id text primary key,
+  email text not null,
+  zip text,
+  served boolean not null default false,
+  matched_store text,
+  product_interest text,
+  utm_source text, utm_medium text, utm_campaign text,
+  utm_content text, utm_term text,
+  consent boolean not null default false,
+  consent_version text,
+  referrer text,
+  page_variant text,
+  created_at timestamptz not null default now(),
+  session_id text,
+  captured_zip text
+);
+create index if not exists idx_leads_zip on public.leads (zip);
+create index if not exists idx_leads_created on public.leads (created_at desc);
+alter table public.leads enable row level security; -- secret key bypasses RLS; no public policy
+```
+
+See captured leads at `/admin?token=…` (reads from the configured primary); export via `npm run leads:export`.
 
 ## Geo data pipeline
 

@@ -14,9 +14,11 @@
     "test:e2e": "playwright test",
     "qa:shots": "node scripts/qa-shots.mjs",
     "qa:genie": "node scripts/qa-genie.mjs",
-    "qa:reference": "node scripts/qa-reference.mjs"
+    "qa:reference": "node scripts/qa-reference.mjs",
+    "qa:pixel": "node scripts/pixel-qa.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "better-sqlite3": "^12.11.1",

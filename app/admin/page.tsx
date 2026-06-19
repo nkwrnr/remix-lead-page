@@ -22,13 +22,14 @@ export default async function AdminPage({
     return <Locked reason="Add ?token=… to view captured leads." />;
   }
 
-  const leads = await getLeadStore().list();
+  const store = getLeadStore();
+  const leads = await store.list();
 
   return (
     <main className="mx-auto max-w-5xl p-6 font-sans">
       <h1 className="text-2xl font-bold mb-1">Captured leads</h1>
       <p className="text-ink-light mb-4">
-        {leads.length} total · source: local store
+        {leads.length} total · source: {store.name}
       </p>
       <div className="overflow-x-auto rounded-card border border-line">
         <table className="w-full text-sm">
