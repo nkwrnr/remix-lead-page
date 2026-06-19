@@ -1,9 +1,3 @@
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  robots: { index: true, follow: true },
-};
-
 "use client";
 
 import Link from "next/link";
@@ -15,16 +9,18 @@ import { RemixImg } from "@/components/redesign/RemixImg";
 import { NextDropModal } from "@/components/redesign/NextDropModal";
 import { StickyDropCta } from "@/components/redesign/StickyDropCta";
 import { TrackingProvider } from "@/components/tracking/TrackingProvider";
-import "./redesign/redesign.css";
 
 const scrollToTop = () =>
   window.scrollTo({ top: 0, behavior: "smooth" });
 
 /**
- * Chrome Drop — "Liquid Chrome Hype" — production live page.
+ * Chrome Drop — "Liquid Chrome Hype" — full page.
  * Drop-culture / hypebeast: lifestyle-photo hero, liquid-chrome display type,
  * holographic accents, die-cut stickers, the zip check as a "drop unlock".
- * Real funnel logic via useFunnel. See /redesign/chrome-drop for the lab reference.
+ * Real funnel logic via useFunnel. Body sections ported from Pocket Pour and
+ * re-skinned in Chrome. Copy is placeholder-grade (final copy in progress);
+ * all imagery comes from the aesthetic-comp folder (Mojito=hero, Paloma=
+ * servings, Margarita=feature + final banner).
  */
 
 const VARIANT = "redesign_chrome_drop";
@@ -423,7 +419,7 @@ export default function ChromeDropPage() {
           {REVIEWS.map((r) => (
             <div key={r.n} className="cd-review">
               <Stars />
-              <p>"{r.q}"</p>
+              <p>“{r.q}”</p>
               <span className="cd-review__name">— {r.n}</span>
             </div>
           ))}
@@ -477,13 +473,14 @@ export default function ChromeDropPage() {
       </section>
 
       {/* ── Footer ──────────────────────────────────────────────────── */}
-      <footer className="cd-foot">
-        <p className="cd-foot__brand">REMIX</p>
-        <p style={{ marginTop: 8, fontSize: "0.85rem" }}>Big flavor. Clean ingredients. Zero regrets.</p>
-        <p style={{ marginTop: 14, fontSize: "0.74rem" }}>
-          <Link href="/privacy" className="rd-textlink">Privacy</Link>
-          {" · "}
-          <Link href="/redesign" className="rd-textlink">Design Lab</Link>
+      <footer className=”cd-foot”>
+        <p className=”cd-foot__brand”>REMIX</p>
+        <p style={{ marginTop: 8, fontSize: “0.85rem” }}>Big flavor. Clean ingredients. Zero regrets.</p>
+        <p style={{ marginTop: 14, fontSize: “0.74rem” }}>
+          <Link href=”/privacy” className=”rd-textlink”>Privacy</Link>
+          {“ · “}
+          <Link href=”/redesign” className=”rd-textlink”>Design Lab</Link>
+          {“ — Lab snapshot (live site is /”}
         </p>
       </footer>
 
