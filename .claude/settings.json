@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run build)",
+      "Bash(npm run build:*)",
+      "Bash(npm run build:geo)",
+      "Bash(npm run lint)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(npm run qa:shots)",
+      "Bash(npm run qa:genie)",
+      "Bash(npm run qa:reference)",
+      "Bash(npm run qa:redesign)",
+      "Bash(npm run leads:export)",
+      "Bash(npx tsc:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npx vitest:*)",
+      "Bash(python3 scripts/build-served-zips.py)",
+      "Bash(node scripts/qa-shots.mjs)",
+      "Bash(node scripts/qa-genie.mjs)",
+      "Bash(node scripts/qa-reference.mjs)",
+      "Bash(node scripts/qa-redesign.mjs)",
+      "Bash(SLUG=*)",
+      "Bash(curl http://localhost:*)",
+      "Bash(curl -s http://localhost:*)",
+      "Read(//Users/the_machine/remix/lead-page/**)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/session-orientation.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/typecheck.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

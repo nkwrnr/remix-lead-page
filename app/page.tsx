@@ -9,6 +9,7 @@ import { RemixImg } from "@/components/redesign/RemixImg";
 import { NextDropModal } from "@/components/redesign/NextDropModal";
 import { StickyDropCta } from "@/components/redesign/StickyDropCta";
 import { TrackingProvider } from "@/components/tracking/TrackingProvider";
+import { AREA_FACTS, FALLBACK_FACTS } from "@/lib/area-facts";
 import "./redesign/redesign.css";
 
 const scrollToTop = () =>
@@ -21,7 +22,9 @@ const scrollToTop = () =>
  * Real funnel logic via useFunnel. See /redesign/chrome-drop for the lab reference.
  */
 
-const VARIANT = "redesign_chrome_drop";
+// Live homepage tag — distinct from the frozen lab snapshot ("redesign_chrome_drop")
+// so real conversions are separable from internal lab views in leads/captures/pixel data.
+const VARIANT = "chrome_drop_live";
 
 const TICKER = [
   "0.0% ABV",
@@ -30,8 +33,16 @@ const TICKER = [
   "Real juice",
   "Electrolytes",
   "Vegan + GF",
-  "Sold out online",
+  "New online drop in days",
   "161 Walmart stores",
+];
+
+// Retro 8-bit stock-exchange ticker that fills the finder↔hero gap (see .cd-newsbar).
+// Terse, board-style, uppercase; ▲ glyphs (not emoji). Lead = the drop.
+const NEWS = [
+  "REMIX DROPPING AT WALMART AHEAD OF THE FOURTH OF JULY — CHECK STORES NOW",
+  "RMX ▲ 161 STORES",
+  "ONLINE: NEW DROP IN DAYS ▲ DEMAND HIGH",
 ];
 
 /* ── Inline icons (currentColor) — lifted from the lab icon set ──────────── */
@@ -132,6 +143,7 @@ const FAQS = [
 export default function ChromeDropPage() {
   const f = useFunnel(VARIANT);
   const [buyOpen, setBuyOpen] = useState(false);
+  const [factsOpen, setFactsOpen] = useState(false);
 
   return (
     <main data-theme="chrome-drop" className="rd-root cd-page">
@@ -173,13 +185,25 @@ export default function ChromeDropPage() {
         </span>
       </section>
 
+      {/* ── Retro "breaking news" crawl — fills the finder↔hero gap on mobile ── */}
+      <div className="cd-newsbar" aria-label="In the news">
+        <span className="cd-newsbar__tag">Breaking</span>
+        <div className="cd-newsbar__viewport">
+          <div className="cd-newsbar__track" aria-hidden>
+            {[...NEWS, ...NEWS].map((n, i) => (
+              <span key={i} className="cd-newsbar__item">{n}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── THE UNLOCK (zip-check) ──────────────────────────────────── */}
       <section id="unlock" className="rd-shell" style={{ paddingTop: 8, paddingBottom: "clamp(48px, 8vw, 96px)", scrollMarginTop: 24 }}>
         <div className="cd-panel" style={{ maxWidth: 580, margin: "0 auto", padding: "clamp(24px, 5vw, 40px)" }}>
           {f.phase === "idle" && (
             <>
               <p className="rd-eyebrow">Walmart called dibs</p>
-              <h2 className="cd-chrome" style={{ fontSize: "clamp(1.9rem, 6vw, 3rem)", marginTop: 8 }}>
+              <h2 className="cd-chrome cd-chrome--finder" style={{ fontSize: "clamp(1.9rem, 6vw, 3rem)", marginTop: 8 }}>
                 Are we in your city?
               </h2>
               <p className="rd-lede" style={{ marginTop: 10, maxWidth: "40ch" }}>
@@ -228,12 +252,36 @@ export default function ChromeDropPage() {
             <div className="cd-served">
               <div className="rd-meltbar">
                 <span className="rd-badge">✦ Unlocked</span>
-                <p className="cd-chrome" style={{ fontSize: "1.9rem", marginTop: 14, color: "#fff" }}>
+                <p className="cd-chrome" style={{ fontSize: "1.9rem", marginTop: 14 }}>
                   Remix is in {f.city ?? "your zone"}.
                 </p>
               </div>
               <div style={{ paddingTop: 20 }}>
                 <StoreCards stores={f.stores} />
+                {f.city && (
+                  <div className="cd-funfacts">
+                    <button
+                      type="button"
+                      className="rd-cta cd-btn--ghost cd-funfacts__toggle"
+                      aria-expanded={factsOpen}
+                      onClick={() => setFactsOpen((o) => !o)}
+                    >
+                      {factsOpen ? "Hide the fun facts" : `Fun facts about ${f.city}`} ✦
+                    </button>
+                    {factsOpen && (
+                      <ul className="cd-funfacts__list">
+                        {(AREA_FACTS[`${f.city}, ${f.stores[0]?.state ?? ""}`] ?? FALLBACK_FACTS).map(
+                          (fact, i) => (
+                            <li key={i}>{fact}</li>
+                          ),
+                        )}
+                        <li className="cd-funfacts__wink">
+                          Totally made up, obviously. We just think {f.city} rules.
+                        </li>
+                      </ul>
+                    )}
+                  </div>
+                )}
                 <RedesignEmailForm
                   heading="Lock your spot for Drop 02"
                   cta="I'm in →"
@@ -254,8 +302,8 @@ export default function ChromeDropPage() {
                 {f.zip ? `${f.zip} ` : "Your zone "}isn&apos;t on the map yet
               </h2>
               <p className="rd-lede" style={{ marginTop: 12 }}>
-                Online&apos;s sold out, so the list is the only way in. Lock your spot
-                and you&apos;re first when Remix drops near{f.zip ? ` ${f.zip}` : " you"}.
+                A new online drop lands in days — and it sells out fast. Lock your
+                spot for first dibs, plus first word when Remix hits{f.zip ? ` ${f.zip}` : " your zone"}.
               </p>
               <RedesignEmailForm
                 heading="Put me first in line"
@@ -279,8 +327,8 @@ export default function ChromeDropPage() {
               </h2>
               <p className="rd-lede" style={{ marginTop: 12 }}>
                 {f.path === "served"
-                  ? `Drop 02 hits your inbox before anyone else's. Until then — there's a can with your name on it near ${f.city ?? "you"}. ✦`
-                  : "The second Remix drops in your zone, you're the first to know. ✦"}
+                  ? `The next online drop lands in days — and you'll hear first. Until then, there's a can with your name on it near ${f.city ?? "you"}. ✦`
+                  : "A new online drop lands in days — and the second Remix reaches your zone, you'll know first. ✦"}
               </p>
             </div>
           )}
@@ -462,8 +510,8 @@ export default function ChromeDropPage() {
           Don&apos;t miss <em>the next one.</em>
         </h2>
         <p className="cd-final__sub">
-          The last drop sold out online in record demand. The list hears first.
-          Drop your zip and you&apos;re in.
+          A new online drop lands in days — and it&apos;ll sell out fast. The list
+          hears first. Drop your zip and you&apos;re in.
         </p>
         <a href="#unlock" className="rd-cta" style={{ width: "auto", padding: "0 34px" }}>
           Drop your zip →
@@ -476,8 +524,6 @@ export default function ChromeDropPage() {
         <p style={{ marginTop: 8, fontSize: "0.85rem" }}>Big flavor. Clean ingredients. Zero regrets.</p>
         <p style={{ marginTop: 14, fontSize: "0.74rem" }}>
           <Link href="/privacy" className="rd-textlink">Privacy</Link>
-          {" · "}
-          <Link href="/redesign" className="rd-textlink">Design Lab</Link>
         </p>
       </footer>
 

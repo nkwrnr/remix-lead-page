@@ -1,0 +1,2096 @@
+/*
+  Redesign Lab — scoped theme styles.
+
+  This file is imported ONLY by app/redesign/layout.tsx, never by the live site.
+  Every rule is namespaced under `.rd-*` classes and activated inside a
+  `[data-theme="…"]` wrapper, so nothing here can leak into `/` or `/genie`.
+
+  Pattern for adding a new redesign:
+    1. Add a `[data-theme="your-slug"]{ … }` token block below.
+    2. Optionally override structural defaults inside that block.
+    3. Build app/redesign/your-slug/page.tsx wrapping content in
+       <div data-theme="your-slug" className="rd-root">…</div>
+    4. Register it in app/redesign/page.tsx (the gallery index).
+
+  Shared `.rd-*` structure reads `var(--rd-*)` tokens; each theme block supplies
+  the tokens. Fonts (--font-display / --font-sans) come from the root layout.
+*/
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME: velvet-rope  (refined editorial — white-forward, "are you in?")
+   ───────────────────────────────────────────────────────────────────────── */
+[data-theme="velvet-rope"] {
+  --rd-bg: #ffffff;
+  --rd-bg-2: #f6f1ea;
+  --rd-ink: #16130f;
+  --rd-ink-soft: #6b655c;
+  --rd-line: rgba(22, 19, 15, 0.12);
+  --rd-line-soft: rgba(22, 19, 15, 0.06);
+  --rd-coral: #e88472;
+  --rd-ember: #ef3d1f;
+  --rd-navy: #2f3a63;
+  --rd-citron: #e9e034;
+  --rd-citron-ink: #351b20;
+  --rd-on-coral: #2a0d05;
+  --rd-radius: 14px;
+  --rd-ease-overshoot: cubic-bezier(0.38, -0.01, 0.24, 1.18);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Shared structure (all themes) — only active inside .rd-root
+   ───────────────────────────────────────────────────────────────────────── */
+.rd-root {
+  background: var(--rd-bg);
+  color: var(--rd-ink);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+.rd-shell {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.rd-shell--narrow {
+  max-width: 600px;
+}
+
+.rd-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--rd-ember);
+}
+.rd-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  color: var(--rd-ink);
+}
+.rd-display em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--rd-ember);
+}
+.rd-lede {
+  font-size: clamp(1.05rem, 2.1vw, 1.35rem);
+  line-height: 1.5;
+  color: var(--rd-ink-soft);
+}
+
+/* Oversized "velvet rope" pill field + CTA */
+.rd-field {
+  width: 100%;
+  border-radius: 300px;
+  border: 1.5px solid var(--rd-line);
+  background: var(--rd-bg);
+  color: var(--rd-ink);
+  padding: 18px 24px;
+  font-size: 1.05rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.rd-field::placeholder {
+  color: color-mix(in srgb, var(--rd-ink-soft) 65%, transparent);
+}
+.rd-field:focus {
+  border-color: var(--rd-coral);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-coral) 28%, transparent);
+}
+.rd-field[aria-invalid="true"] {
+  border-color: var(--rd-ember);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-ember) 22%, transparent);
+}
+
+.rd-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  border-radius: 300px;
+  border: none;
+  background: var(--rd-coral);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.18s var(--rd-ease-overshoot),
+    box-shadow 0.2s;
+  box-shadow: 0 16px 34px -18px color-mix(in srgb, var(--rd-coral) 80%, black);
+}
+.rd-cta:hover:not(:disabled) {
+  background: var(--rd-ember);
+  transform: translateY(-2px);
+}
+.rd-cta:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.rd-cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.rd-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-coral) 40%, transparent);
+}
+
+.rd-textlink {
+  color: var(--rd-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+.rd-textlink:hover {
+  color: var(--rd-ember);
+}
+
+/* Result panel shell */
+.rd-panel {
+  border: 1px solid var(--rd-line);
+  border-radius: var(--rd-radius);
+  background: var(--rd-bg);
+  overflow: hidden;
+  box-shadow: 0 30px 60px -40px rgba(22, 19, 15, 0.45);
+}
+
+/* The citron "YOU'RE IN" badge */
+.rd-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--rd-citron);
+  color: var(--rd-citron-ink);
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 300px;
+}
+
+/* Store card */
+.rd-card {
+  border: 1px solid var(--rd-line);
+  border-radius: 10px;
+  background: var(--rd-bg);
+  padding: 16px;
+  text-align: left;
+}
+.rd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--rd-coral) 14%, transparent);
+  color: var(--rd-ember);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 300px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THE MELT  — coral floods down with a drippy leading edge (served / "IN")
+   ───────────────────────────────────────────────────────────────────────── */
+.rd-meltbar {
+  position: relative;
+  background: var(--rd-coral);
+  color: #fff;
+  padding: 22px 24px 34px;
+  clip-path: polygon(
+    0% 0%, 100% 0%,
+    100% 100%, 88% 95%, 75% 100%, 62% 94%, 50% 100%,
+    38% 95%, 25% 100%, 12% 94%, 0% 99%
+  );
+  animation: rd-melt 0.75s cubic-bezier(0.5, -0.2, 0.35, 1.1) both;
+}
+@keyframes rd-melt {
+  0% {
+    clip-path: polygon(
+      0% 0%, 100% 0%,
+      100% 1%, 88% 0%, 75% 2%, 62% 0%, 50% 2%,
+      38% 0%, 25% 2%, 12% 0%, 0% 1%
+    );
+  }
+  100% {
+    clip-path: polygon(
+      0% 0%, 100% 0%,
+      100% 100%, 88% 95%, 75% 100%, 62% 94%, 50% 100%,
+      38% 95%, 25% 100%, 12% 94%, 0% 99%
+    );
+  }
+}
+/* content inside the meltbar fades up once the flood lands */
+.rd-meltbar > * {
+  animation: rd-fadeup 0.4s ease-out 0.4s both;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THE FLIP — panel flips to navy (unserved / "not yet")
+   ───────────────────────────────────────────────────────────────────────── */
+.rd-flip {
+  background: var(--rd-navy);
+  color: #fff;
+  transform-origin: top center;
+  animation: rd-flip 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.rd-flip .rd-eyebrow {
+  color: var(--rd-citron);
+}
+.rd-flip .rd-display {
+  color: #fff;
+}
+.rd-flip .rd-display em {
+  color: var(--rd-citron);
+}
+@keyframes rd-flip {
+  0% {
+    transform: perspective(900px) rotateX(-88deg);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(900px) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes rd-fadeup {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rd-rise {
+  animation: rd-fadeup 0.35s ease-out both;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HERO line-by-line reveal (Chain Zoku --line-index mechanic)
+   ───────────────────────────────────────────────────────────────────────── */
+.rd-reveal .rd-line {
+  display: block;
+  overflow: hidden;
+}
+.rd-reveal .rd-line > span {
+  display: inline-block;
+  transform: translateY(115%);
+  animation: rd-lineup 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--line-index, 0) * 0.09s + 0.05s);
+}
+@keyframes rd-lineup {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* staggered store-card entrance */
+.rd-stagger > * {
+  animation: rd-fadeup 0.5s ease-out both;
+}
+.rd-stagger > *:nth-child(1) {
+  animation-delay: 0.06s;
+}
+.rd-stagger > *:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.rd-stagger > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* consent checkbox accent */
+.rd-root input[type="checkbox"] {
+  accent-color: var(--rd-coral);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   THEME: drop-siren  (maximalist drop-hype — dark ground, coral × citron clash)
+   ═════════════════════════════════════════════════════════════════════════ */
+[data-theme="drop-siren"] {
+  --rd-bg: #16130f;
+  --rd-bg-2: #211c16;
+  --rd-ink: #ffffff;
+  --rd-ink-soft: rgba(255, 255, 255, 0.72);
+  --rd-line: rgba(255, 255, 255, 0.16);
+  --rd-line-soft: rgba(255, 255, 255, 0.08);
+  --rd-coral: #e88472;
+  --rd-ember: #ef3d1f;
+  --rd-navy: #2f3a63;
+  --rd-citron: #e9e034;
+  --rd-citron-ink: #351b20;
+  --rd-on-coral: #2a0d05;
+  --rd-radius: 18px;
+  --rd-ease-overshoot: cubic-bezier(0.38, -0.18, 0.24, 1.32);
+}
+/* dark-theme token overrides on shared structure */
+[data-theme="drop-siren"] .rd-eyebrow {
+  color: var(--rd-citron);
+}
+[data-theme="drop-siren"] .rd-display em {
+  color: var(--rd-citron);
+}
+[data-theme="drop-siren"] .rd-field {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+[data-theme="drop-siren"] .rd-field:focus {
+  border-color: var(--rd-citron);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rd-citron) 28%, transparent);
+}
+[data-theme="drop-siren"] .rd-card {
+  background: var(--rd-bg-2);
+}
+[data-theme="drop-siren"] .rd-chip {
+  background: color-mix(in srgb, var(--rd-citron) 18%, transparent);
+  color: var(--rd-citron);
+}
+/* The Behave two-color lock: coral bg / citron text → INVERTS on hover */
+[data-theme="drop-siren"] .rd-cta {
+  background: var(--rd-coral);
+  color: var(--rd-citron-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+  box-shadow: 0 0 0 2px var(--rd-coral) inset;
+}
+[data-theme="drop-siren"] .rd-cta:hover:not(:disabled) {
+  background: var(--rd-citron);
+  color: var(--rd-ember);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* drifting aurora background (CSS-only "shader" feel) */
+.ds-aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.ds-aurora::before,
+.ds-aurora::after {
+  content: "";
+  position: absolute;
+  width: 70vw;
+  height: 70vw;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  will-change: transform;
+}
+.ds-aurora::before {
+  background: radial-gradient(circle, var(--rd-coral), transparent 60%);
+  top: -20%;
+  left: -10%;
+  animation: ds-drift1 16s ease-in-out infinite;
+}
+.ds-aurora::after {
+  background: radial-gradient(circle, var(--rd-ember), transparent 60%);
+  bottom: -25%;
+  right: -10%;
+  animation: ds-drift2 20s ease-in-out infinite;
+}
+@keyframes ds-drift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(12vw, 8vh) scale(1.15); }
+}
+@keyframes ds-drift2 {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-10vw, -6vh) scale(0.9); }
+}
+
+/* "tada" attention engine (Behave) — toggled by JS via .is-jiggling */
+@keyframes ds-tada {
+  0% { transform: scale(1) rotate(0); }
+  10%, 20% { transform: scale(0.94) rotate(-3deg); }
+  30%, 50%, 70%, 90% { transform: scale(1.06) rotate(3deg); }
+  40%, 60%, 80% { transform: scale(1.06) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.ds-jiggle.is-jiggling {
+  animation: ds-tada 0.75s ease both;
+}
+
+/* sticker-chip marquee (rotated chips, Behave) */
+.ds-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.ds-marquee__track {
+  display: inline-flex;
+  gap: 14px;
+  padding-block: 4px;
+  animation: ds-marquee 22s linear infinite;
+}
+@keyframes ds-marquee {
+  to { transform: translateX(-50%); }
+}
+.ds-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 300px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: rotate(var(--rotate, 0deg));
+  background: var(--rd-citron);
+  color: var(--rd-citron-ink);
+}
+.ds-sticker:nth-child(even) {
+  background: var(--rd-coral);
+  color: var(--rd-on-coral);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   THEME: drop-siren-v2  ("Relentless" — dark hero, but a LOUD vibrant finder)
+   ═════════════════════════════════════════════════════════════════════════ */
+[data-theme="drop-siren-v2"] {
+  /* BRIGHT + LOUD — warm cream ground, hot coral + acid citron, NOT dark */
+  --rd-bg: #fdf0e1;
+  --rd-bg-2: #ffffff;
+  --rd-ink: #1c1208;
+  --rd-ink-soft: #7a6a59;
+  --rd-ink-dark: #1c1208; /* text on bright surfaces */
+  --rd-line: rgba(28, 18, 8, 0.14);
+  --rd-line-soft: rgba(28, 18, 8, 0.07);
+  --rd-coral: #ef5b3c;
+  --rd-ember: #d92d12;
+  --rd-navy: #2f3a63;
+  --rd-citron: #e9e034;
+  --rd-citron-ink: #351b20;
+  --rd-on-coral: #ffffff;
+  --rd-radius: 18px;
+  --rd-ease-overshoot: cubic-bezier(0.38, -0.18, 0.24, 1.32);
+}
+/* v2 punchy uppercase CTA */
+[data-theme="drop-siren-v2"] .rd-cta {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+}
+/* bright hero wash (light citron/coral glow on cream — loud, not dark) */
+.ds2-hero {
+  position: relative;
+  background:
+    radial-gradient(110% 80% at 82% -8%, rgba(233, 224, 52, 0.55), transparent 58%),
+    radial-gradient(95% 70% at -8% 8%, rgba(239, 91, 60, 0.28), transparent 55%);
+}
+/* a die-cut sticker you can slap over an image */
+.sticker-slap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  padding: 9px 15px;
+  border-radius: 13px;
+  border: 3px solid #fff;
+  background: var(--rd-citron);
+  color: var(--rd-citron-ink);
+  box-shadow: 4px 6px 0 rgba(28, 18, 8, 0.18);
+  transform: rotate(-8deg);
+}
+
+/* hero grid: stacked on mobile, text | can on desktop */
+.ds2-herogrid {
+  display: grid;
+  gap: 28px;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 760px) {
+  .ds2-herogrid {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+  .ds2-herogrid > div:last-child {
+    order: 1;
+  }
+}
+
+/* ── THE LOUD VIBRANT STORE FINDER (the attention peak — breaks the dark) ── */
+.ds2-finder {
+  position: relative;
+  border-radius: 28px;
+  padding: clamp(26px, 5vw, 54px);
+  color: var(--rd-ink-dark);
+  background:
+    radial-gradient(130% 130% at 0% 0%, var(--rd-ember) 0%, transparent 52%),
+    linear-gradient(135deg, var(--rd-citron) 0%, #ffd23e 42%, var(--rd-coral) 100%);
+  box-shadow: 0 40px 90px -34px rgba(233, 224, 52, 0.55),
+    0 0 0 3px rgba(22, 19, 15, 0.06) inset;
+  overflow: hidden;
+  animation: ds2-finderglow 3s ease-in-out infinite;
+}
+@keyframes ds2-finderglow {
+  0%, 100% { box-shadow: 0 40px 90px -34px rgba(233, 224, 52, 0.45); }
+  50% { box-shadow: 0 44px 100px -30px rgba(239, 61, 31, 0.6); }
+}
+.ds2-finder .rd-eyebrow {
+  color: var(--rd-ember);
+}
+.ds2-finder .rd-display {
+  color: var(--rd-ink-dark);
+}
+.ds2-finder .rd-display em {
+  color: #fff;
+}
+.ds2-finder .rd-lede {
+  color: rgba(22, 19, 15, 0.78);
+}
+.ds2-finder .rd-field {
+  background: #fff;
+  color: var(--rd-ink-dark);
+  border-color: transparent;
+}
+.ds2-finder .rd-field:focus {
+  border-color: var(--rd-ink-dark);
+  box-shadow: 0 0 0 4px rgba(22, 19, 15, 0.28);
+}
+.ds2-finder .rd-cta {
+  background: var(--rd-ink-dark);
+  color: var(--rd-citron);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ds2-finder .rd-cta:hover:not(:disabled) {
+  background: #000;
+  color: #fff;
+  transform: translateY(-2px) scale(1.01);
+}
+.ds2-finder .rd-textlink {
+  color: rgba(22, 19, 15, 0.72);
+}
+.ds2-finder .rd-textlink:hover {
+  color: #fff;
+}
+/* the result panel sits on its own surface inside the vibrant block */
+.ds2-finder .rd-panel {
+  background: var(--rd-bg-2);
+  color: var(--rd-ink);
+  border-color: var(--rd-line);
+}
+
+/* ── Punchy callouts as DIE-CUT STICKERS (rotated, white border, chunky) ─── */
+.qc-grid {
+  display: grid;
+  gap: 26px 22px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  padding-block: 8px;
+}
+.qc-sticker {
+  position: relative;
+  border-radius: 22px;
+  padding: 28px 24px 26px;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 1px rgba(28, 18, 8, 0.14), 10px 14px 0 -2px rgba(28, 18, 8, 0.16);
+  background: var(--rd-citron);
+  color: var(--rd-citron-ink);
+  transform: rotate(var(--rot, -2deg));
+  transition: transform 0.25s var(--rd-ease-overshoot);
+}
+.qc-sticker:hover {
+  transform: rotate(0deg) scale(1.03);
+}
+.qc-sticker__tab {
+  position: absolute;
+  top: -14px;
+  left: 20px;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 0 rgba(28, 18, 8, 0.2));
+}
+.qc-sticker__head {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.55rem, 3.6vw, 2.2rem);
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+.qc-sticker__sub {
+  margin-top: 12px;
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.qc-sticker--coral {
+  background: var(--rd-coral);
+  color: #fff;
+}
+.qc-sticker--coral .qc-sticker__sub { color: rgba(255, 255, 255, 0.92); }
+.qc-sticker--navy {
+  background: var(--rd-navy);
+  color: #fff;
+}
+.qc-sticker--navy .qc-sticker__sub { color: rgba(255, 255, 255, 0.85); }
+
+/* ── Battle card: REMIX | Others — true SPLIT DOWN THE MIDDLE (DrinkRemix) ── */
+.bc {
+  position: relative;
+  border-radius: 22px;
+  border: 1px solid var(--rd-line);
+  background: var(--rd-bg-2);
+  overflow: hidden;
+  box-shadow: 0 24px 50px -34px rgba(28, 18, 8, 0.4);
+}
+/* the split */
+.bc::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: var(--rd-line);
+  transform: translateX(-1px);
+  z-index: 2;
+}
+.bc__head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.bc__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 26px 18px 22px;
+}
+.bc__side--win {
+  background: linear-gradient(180deg, rgba(233, 224, 52, 0.4), rgba(239, 91, 60, 0.16));
+}
+.bc__badge {
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border-radius: 300px;
+}
+.bc__badge--win {
+  background: var(--rd-ink);
+  color: var(--rd-citron);
+}
+.bc__badge--lose {
+  background: rgba(28, 18, 8, 0.08);
+  color: var(--rd-ink-soft);
+}
+.bc__imgwrap {
+  width: 100%;
+  max-width: 96px;
+}
+.bc__imgwrap--lose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  aspect-ratio: 0.55;
+  font-size: 2.6rem;
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+.bc__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  border-top: 1px dashed var(--rd-line);
+  min-height: 64px;
+}
+.bc__cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  padding: 14px 16px;
+}
+.bc__cell--win {
+  justify-content: flex-start;
+  color: var(--rd-ink);
+  font-weight: 600;
+  padding-right: 60px;
+}
+.bc__cell--lose {
+  justify-content: flex-end;
+  text-align: right;
+  color: var(--rd-ink-soft);
+  padding-left: 60px;
+}
+/* feature label as a pill sitting ON the center split */
+.bc__label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  background: var(--rd-ink);
+  color: #fff;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  padding: 5px 11px;
+  border-radius: 300px;
+  white-space: nowrap;
+}
+.bc__ic { flex-shrink: 0; }
+@media (max-width: 520px) {
+  .bc__cell { font-size: 0.78rem; }
+  .bc__cell--win { padding-right: 46px; }
+  .bc__cell--lose { padding-left: 46px; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Reduced motion — kill all redesign motion, show resting/end states
+   ───────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .rd-meltbar,
+  .rd-flip,
+  .rd-rise,
+  .rd-reveal .rd-line > span,
+  .rd-stagger > *,
+  .rd-meltbar > *,
+  .ds-aurora::before,
+  .ds-aurora::after,
+  .ds-jiggle.is-jiggling,
+  .ds-marquee__track,
+  .ds2-finder,
+  .qc-sticker {
+    animation: none !important;
+  }
+  .qc-sticker {
+    transform: rotate(var(--rot, -2deg)) !important;
+  }
+  .rd-reveal .rd-line > span {
+    transform: none !important;
+  }
+  .rd-cta {
+    transition: background 0.15s !important;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   THEME: chrome-drop  ("Liquid Chrome Hype" — drop-culture / hypebeast)
+   Deep graphite ground, liquid-chrome display type, holographic iridescent
+   accents, glossy sticker burst, the zip check framed as a "drop unlock".
+   Brand tie kept: coral = the unlock/"you're in" flood, citron on holo.
+   ═════════════════════════════════════════════════════════════════════════ */
+[data-theme="chrome-drop"] {
+  --rd-bg:        #0a0b10;           /* deep cool graphite */
+  --rd-bg-2:      #12141d;           /* raised panel */
+  --rd-ink:       #eef1f8;           /* chrome white text */
+  --rd-ink-soft:  #9aa3bd;           /* muted steel */
+  --rd-line:      rgba(170, 184, 224, 0.16);
+  --rd-line-soft: rgba(170, 184, 224, 0.08);
+  --rd-coral:     #ef6a4d;           /* hotter coral for dark ground */
+  --rd-ember:     #ff7a52;
+  --rd-navy:      #14161f;           /* unserved flip = darker graphite */
+  --rd-citron:    #D1FE17;           /* the bright lime accent (was #e9e034) */
+  --rd-citron-ink:#15200a;
+  --cd-magenta:   #ED1671;           /* hot magenta — comparison pills + accents */
+  --rd-on-coral:  #2a0d05;
+  --rd-radius:    16px;
+  --rd-ease-overshoot: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* the liquid-chrome metal bevel (top-lit) */
+  --cd-chrome: linear-gradient(
+    176deg,
+    #ffffff 0%, #e6ecfa 14%, #b7c1da 30%, #828caa 43%,
+    #ffffff 49%, #6f7896 55%, #aab4cf 70%, #eef2fb 86%, #c3cce0 100%
+  );
+  /* holographic iridescence */
+  --cd-holo: linear-gradient(
+    110deg, #8ef6ff 0%, #b69bff 24%, #ff9ee0 48%, #ffd98a 70%, #9dffc6 100%
+  );
+  --cd-holo-conic: conic-gradient(
+    from 210deg,
+    #8ef6ff, #b69bff, #ff9ee0, #ffd98a, #9dffc6, #8ef6ff
+  );
+}
+
+/* Ground: graphite + faint holo aura, no leak outside the page */
+/* root is a flex column so the two sections can be reordered on mobile
+   (compound selector — data-theme is ON the .cd-page element itself) */
+[data-theme="chrome-drop"].cd-page {
+  display: flex;
+  flex-direction: column;
+}
+[data-theme="chrome-drop"].rd-root,
+[data-theme="chrome-drop"] .cd-page {
+  background:
+    radial-gradient(120% 70% at 50% -10%, rgba(150, 130, 255, 0.18), transparent 60%),
+    radial-gradient(90% 60% at 85% 8%, rgba(255, 158, 224, 0.12), transparent 55%),
+    radial-gradient(80% 50% at 12% 4%, rgba(142, 246, 255, 0.10), transparent 55%),
+    var(--rd-bg);
+  background-attachment: fixed;
+}
+
+[data-theme="chrome-drop"] .rd-eyebrow { color: var(--rd-citron); }
+[data-theme="chrome-drop"] .rd-lede { color: var(--rd-ink-soft); }
+
+/* Hero grid: stacked mobile, 2-col (copy | can) on desktop */
+[data-theme="chrome-drop"] .cd-herogrid {
+  display: grid;
+  gap: clamp(28px, 5vw, 48px);
+  align-items: center;
+}
+@media (min-width: 760px) {
+  [data-theme="chrome-drop"] .cd-herogrid {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+/* ── Liquid chrome headline ─────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-chrome {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  background: var(--cd-chrome);
+  background-size: 100% 220%;
+  background-position: 50% 22%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  /* engraved edge so chrome reads on dark */
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.35))
+    drop-shadow(0 3px 14px rgba(120, 140, 220, 0.35));
+  animation: cd-flow 7s ease-in-out infinite;
+}
+@keyframes cd-flow {
+  0%, 100% { background-position: 50% 18%; }
+  50%      { background-position: 50% 82%; }
+}
+/* finder headline "Are we in your / city?" — tighten the two-line stack
+   (scoped here so the shared .cd-chrome line-height stays untouched elsewhere) */
+[data-theme="chrome-drop"] .cd-chrome--finder { line-height: 0.82; }
+/* holographic word inside the headline (the accent) */
+[data-theme="chrome-drop"] .cd-chrome .cd-holo,
+[data-theme="chrome-drop"] .cd-holoword {
+  background: var(--cd-holo);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(255, 150, 224, 0.4));
+  animation: cd-holoshift 6s linear infinite;
+}
+@keyframes cd-holoshift {
+  to { background-position: 220% 0; }
+}
+
+/* gloss sweep across the hero headline */
+[data-theme="chrome-drop"] .cd-gloss { position: relative; overflow: hidden; }
+[data-theme="chrome-drop"] .cd-gloss::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -60%;
+  width: 40%;
+  height: 140%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: cd-sweep 5.5s ease-in-out 1.2s infinite;
+  pointer-events: none;
+}
+@keyframes cd-sweep {
+  0%   { left: -60%; }
+  55%  { left: 130%; }
+  100% { left: 130%; }
+}
+
+/* ── Holographic pill CTA ───────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .rd-cta {
+  background: var(--cd-holo);
+  background-size: 200% 100%;
+  color: #15131f;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    0 10px 30px -10px rgba(150, 130, 255, 0.7),
+    0 2px 0 rgba(255, 255, 255, 0.4) inset;
+  transition: background-position 0.5s var(--rd-ease-overshoot),
+    transform 0.18s var(--rd-ease-overshoot), box-shadow 0.2s, filter 0.2s;
+}
+[data-theme="chrome-drop"] .rd-cta:hover:not(:disabled) {
+  background-image: var(--cd-holo); /* keep the holo on hover (beats global coral hover) */
+  background-position: 100% 0;
+  transform: translateY(-2px);
+  filter: brightness(1.06) saturate(1.1);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    0 16px 40px -12px rgba(255, 158, 224, 0.8);
+}
+
+/* ── Glassy chrome zip field ────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .rd-field {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1.5px solid var(--rd-line);
+  color: var(--rd-ink);
+  backdrop-filter: blur(6px);
+  letter-spacing: 0.02em;
+}
+[data-theme="chrome-drop"] .rd-field::placeholder { color: rgba(154, 163, 189, 0.7); }
+[data-theme="chrome-drop"] .rd-field:focus {
+  border-color: transparent;
+  box-shadow:
+    0 0 0 2px rgba(142, 246, 255, 0.7),
+    0 0 22px -2px rgba(182, 155, 255, 0.7);
+}
+
+/* ── Drop-tag + holo chip ───────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 300px;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #0c0d12;
+  background: var(--cd-holo);
+  background-size: 200% 100%;
+  animation: cd-holoshift 8s linear infinite;
+  box-shadow: 0 6px 18px -8px rgba(182, 155, 255, 0.8);
+}
+[data-theme="chrome-drop"] .cd-tag--ghost {
+  color: var(--rd-ink);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--rd-line);
+  animation: none;
+  box-shadow: none;
+}
+
+/* ── Sticker burst seal (starburst) ─────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-burst {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  text-align: center;
+  color: #15131f;
+  font-weight: 900;
+  font-size: 0.82rem;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: var(--cd-holo-conic);
+  clip-path: polygon(
+    50% 0%, 61% 12%, 77% 8%, 78% 25%, 94% 28%, 86% 43%, 100% 50%,
+    86% 57%, 94% 72%, 78% 75%, 77% 92%, 61% 88%, 50% 100%, 39% 88%,
+    23% 92%, 22% 75%, 6% 72%, 14% 57%, 0% 50%, 14% 43%, 6% 28%,
+    22% 25%, 23% 8%, 39% 12%
+  );
+  box-shadow: 0 14px 34px -12px rgba(255, 158, 224, 0.7);
+  animation: cd-spin 18s linear infinite;
+}
+[data-theme="chrome-drop"] .cd-burst > span { transform: rotate(0deg); }
+@keyframes cd-spin { to { transform: rotate(360deg); } }
+
+/* ── Can pedestal w/ holo glow + reflection ─────────────────────────────── */
+[data-theme="chrome-drop"] .cd-can {
+  position: relative;
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.55));
+}
+[data-theme="chrome-drop"] .cd-can::before {
+  content: "";
+  position: absolute;
+  inset: 6% 8% 8% 8%;
+  border-radius: 50%;
+  background: var(--cd-holo-conic);
+  filter: blur(34px);
+  opacity: 0.55;
+  z-index: -1;
+  animation: cd-spin 22s linear infinite;
+}
+
+/* ── Panels (zip-check ground) ──────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-panel {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--rd-line);
+  border-radius: var(--rd-radius);
+  box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+[data-theme="chrome-drop"] .cd-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--cd-holo);
+  background-size: 200% 100%;
+  animation: cd-holoshift 6s linear infinite;
+}
+[data-theme="chrome-drop"] .rd-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--rd-line);
+  color: var(--rd-ink);
+}
+[data-theme="chrome-drop"] .rd-chip {
+  background: rgba(142, 246, 255, 0.14);
+  color: #bdecff;
+}
+[data-theme="chrome-drop"] .rd-textlink { color: var(--rd-ink-soft); }
+[data-theme="chrome-drop"] .rd-textlink:hover { color: #ff9ee0; }
+
+/* served meltbar = solid LIME flood (was coral, briefly holo). The "Remix is in
+   {city}" headline keeps the original liquid-chrome animation (.cd-chrome base). */
+[data-theme="chrome-drop"] .cd-served .rd-meltbar {
+  background: var(--rd-citron);
+  color: var(--rd-bg);
+}
+/* "✦ Unlocked" pill — dark graphite chip (a lime pill would vanish into the flood) */
+[data-theme="chrome-drop"] .cd-served .rd-badge {
+  background: var(--rd-bg);
+  color: #fff;
+}
+[data-theme="chrome-drop"] .cd-served .rd-eyebrow { color: #fff; }
+[data-theme="chrome-drop"] .cd-served .rd-lede { color: rgba(255, 255, 255, 0.92); }
+/* unserved flip on graphite: light body text */
+[data-theme="chrome-drop"] .rd-flip .rd-lede,
+[data-theme="chrome-drop"] .cd-unserved .rd-lede { color: rgba(238, 241, 248, 0.86); }
+
+/* ── Lifestyle photo hero (real purple Mojito shot) ─────────────────────── */
+[data-theme="chrome-drop"] .cd-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: min(94vh, 900px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(56px, 9vw, 96px) 20px clamp(28px, 6vw, 56px);
+  background: #0a0b10 url("/images/chrome-drop/hero-mojito.jpg") center 26% / cover no-repeat;
+  overflow: hidden;
+}
+[data-theme="chrome-drop"] .cd-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 6, 18, 0.86) 0%, rgba(10, 6, 22, 0.34) 30%,
+    rgba(10, 6, 22, 0.16) 56%, rgba(8, 6, 18, 0.5) 78%, rgba(8, 6, 18, 0.82) 100%
+  );
+}
+[data-theme="chrome-drop"] .cd-hero__top {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  z-index: 3;
+}
+[data-theme="chrome-drop"] .cd-hero__h1 {
+  color: #fff;
+  font-size: clamp(2.8rem, 9vw, 5.6rem);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.5);
+  margin: 6px 0 0;
+}
+[data-theme="chrome-drop"] .cd-hero__h1 em {
+  color: var(--rd-citron);
+  font-style: italic;
+}
+[data-theme="chrome-drop"] .cd-hero__sub {
+  margin: 16px auto 0;
+  max-width: 32ch;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: clamp(1rem, 2.3vw, 1.2rem);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 2px 22px rgba(0, 0, 0, 0.75);
+}
+[data-theme="chrome-drop"] .cd-hero__cta {
+  width: auto;
+  margin-top: clamp(20px, 3vw, 28px);
+  padding: 0 32px;
+  z-index: 3;
+}
+[data-theme="chrome-drop"] .cd-hero__spacer { flex: 1; min-height: 12px; }
+
+/* Decorative scroll cue — the hero pill that bobs to guide the eye downward
+   (non-interactive; the real zip capture lives in the finder above). */
+[data-theme="chrome-drop"] .cd-scrollcue {
+  cursor: default;
+  animation: cd-bob 1.7s ease-in-out infinite;
+}
+[data-theme="chrome-drop"] .cd-scrollcue__chev {
+  display: inline-block;
+  margin-left: 8px;
+  animation: cd-bob 1.7s ease-in-out infinite 0.15s;
+}
+@keyframes cd-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(7px); }
+}
+
+/* ── Die-cut stickers (replace the carousel arrows) ─────────────────────── */
+[data-theme="chrome-drop"] .cd-sticker {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #14121d;
+  letter-spacing: -0.01em;
+  line-height: 0.96;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+  transform: rotate(var(--rot, -4deg));
+  user-select: none;
+}
+[data-theme="chrome-drop"] .cd-sticker::after {
+  /* little 4-point sparkle */
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  top: -6px;
+  right: -2px;
+  background: #fff;
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+[data-theme="chrome-drop"] .cd-sticker--burst {
+  width: 152px;
+  height: 152px;
+  font-size: 1.26rem;
+  padding: 0 20px;
+  clip-path: polygon(
+    50% 0%, 60% 13%, 76% 7%, 76% 24%, 93% 25%, 84% 40%, 100% 50%,
+    84% 60%, 93% 75%, 76% 76%, 76% 93%, 60% 87%, 50% 100%, 40% 87%,
+    24% 93%, 24% 76%, 7% 75%, 16% 60%, 0% 50%, 16% 40%, 7% 25%,
+    24% 24%, 24% 7%, 40% 13%
+  );
+}
+[data-theme="chrome-drop"] .cd-sticker--blob {
+  padding: 20px 26px;
+  font-size: 1.18rem;
+  border-radius: 64% 36% 57% 43% / 54% 58% 42% 46%;
+}
+[data-theme="chrome-drop"] .cd-sticker--tag {
+  padding: 13px 20px;
+  font-size: 1rem;
+  clip-path: polygon(1% 10%, 99% 0%, 98% 90%, 2% 100%);
+}
+[data-theme="chrome-drop"] .cd-sticker--purple { background: #a274d8; }
+[data-theme="chrome-drop"] .cd-sticker--orange { background: #f4a23c; }
+[data-theme="chrome-drop"] .cd-sticker--teal { background: #62d6c4; }
+[data-theme="chrome-drop"] .cd-sticker--green { background: #c2e35c; }
+
+/* sticker placement — desktop flanks the can */
+[data-theme="chrome-drop"] .cd-sticker--p1 { top: 44%; left: 4%; }
+[data-theme="chrome-drop"] .cd-sticker--p2 { top: 39%; right: 4%; }
+[data-theme="chrome-drop"] .cd-sticker--p3 { bottom: 13%; left: 5%; }
+[data-theme="chrome-drop"] .cd-sticker--p4 { bottom: 12%; right: 6%; }
+
+@media (max-width: 720px) {
+  /* all 4 stickers visible on mobile, flanking the can below the headline+CTA */
+  [data-theme="chrome-drop"] .cd-sticker--burst { width: 96px; height: 96px; font-size: 0.86rem; }
+  [data-theme="chrome-drop"] .cd-sticker--tag { font-size: 0.82rem; padding: 10px 14px; }
+  [data-theme="chrome-drop"] .cd-sticker--blob { font-size: 0.98rem; padding: 16px 20px; }
+  /* taller hero gives the (now longer) headline+CTA room, so the stickers sit
+     clearly below the CTA, flanking the can — no overlap */
+  [data-theme="chrome-drop"] .cd-hero { min-height: 86vh; background-position: 50% 28%; }
+  [data-theme="chrome-drop"] .cd-sticker--p1 { top: auto; bottom: 29%; left: -4%; }
+  [data-theme="chrome-drop"] .cd-sticker--p2 { top: auto; bottom: 25%; right: -4%; }
+  [data-theme="chrome-drop"] .cd-sticker--p3 { bottom: 16%; left: 2%; }
+  [data-theme="chrome-drop"] .cd-sticker--p4 { bottom: 11%; right: 3%; }
+
+  /* thin fact-ticker band overlaying the cropped hero's bottom edge — keeps
+     the gaussian-blur look at the original slim height. margin == -min-height
+     so the body still starts exactly at the hero's bottom (no overlap). */
+  [data-theme="chrome-drop"] .cd-ticker {
+    min-height: 52px;
+    margin-top: -52px;
+    position: relative;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    padding-block: 0;
+    background: linear-gradient(180deg, rgba(9, 10, 16, 0.35), rgba(9, 10, 16, 0.88));
+    backdrop-filter: blur(5px);
+    border-top: 1px solid var(--rd-line);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  /* mobile order: zip finder first, news crawl in the gap, photo hero third, rest
+     in source order (negative orders so the default-0 sections stay after the hero) */
+  /* trim the finder's big inline bottom pad (hence !important) — the crawl now
+     divides it from the hero, so the dead space isn't needed */
+  [data-theme="chrome-drop"] #unlock { order: -3; padding-bottom: 18px !important; }
+  [data-theme="chrome-drop"] .cd-newsbar { order: -2; }
+  [data-theme="chrome-drop"] .cd-hero { order: -1; }
+}
+
+/* ── Section rhythm + section eyebrow/heading ───────────────────────────── */
+[data-theme="chrome-drop"] .cd-section { padding-block: clamp(48px, 8vw, 96px); }
+[data-theme="chrome-drop"] .cd-h2 {
+  font-family: var(--font-display);
+  color: #fff;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+[data-theme="chrome-drop"] .cd-h2 em { color: var(--rd-citron); font-style: italic; }
+
+/* ── Fact ticker / marquee ──────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-ticker {
+  overflow: hidden;
+  border-block: 1px solid var(--rd-line);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+[data-theme="chrome-drop"] .cd-ticker__track {
+  display: flex;
+  gap: 36px;
+  width: max-content;
+  animation: cd-ticker 28s linear infinite;
+}
+@keyframes cd-ticker {
+  to { transform: translateX(-50%); }
+}
+[data-theme="chrome-drop"] .cd-ticker__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.95rem;
+  color: var(--rd-ink);
+}
+[data-theme="chrome-drop"] .cd-ticker__item::before {
+  content: "✦";
+  color: var(--rd-citron);
+  font-size: 0.9em;
+}
+
+/* ── Retro 8-bit stock-exchange ticker (.cd-newsbar) ─────────────────────────
+   A slim black LED board: pixel font, phosphor-green crawl, CRT scanlines, a red
+   "BREAKING" tag with a blinking block cursor. Fills the finder↔hero gap. */
+[data-theme="chrome-drop"] .cd-newsbar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border-block: 1px solid rgba(54, 240, 106, 0.22);
+  background: #050806;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+}
+/* CRT scanlines over the whole board */
+[data-theme="chrome-drop"] .cd-newsbar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.4) 2px 3px);
+}
+[data-theme="chrome-drop"] .cd-newsbar__tag {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 16px;
+  z-index: 2;
+  background: #050806;
+  border-right: 1px solid rgba(54, 240, 106, 0.22);
+  color: #ff3b4e;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 0 6px rgba(255, 59, 78, 0.6);
+}
+/* blinking block cursor — pure 8-bit, no emoji */
+[data-theme="chrome-drop"] .cd-newsbar__tag::before {
+  content: "";
+  width: 7px;
+  height: 9px;
+  background: #ff3b4e;
+  box-shadow: 0 0 6px rgba(255, 59, 78, 0.7);
+  animation: cd-news-blink 1.05s steps(1, end) infinite;
+}
+@keyframes cd-news-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+[data-theme="chrome-drop"] .cd-newsbar__viewport {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
+}
+[data-theme="chrome-drop"] .cd-newsbar__track {
+  display: flex;
+  gap: 28px;
+  width: max-content;
+  padding: 12px 24px;
+  animation: cd-newsroll 52s linear infinite;
+}
+@keyframes cd-newsroll {
+  to { transform: translateX(-50%); }
+}
+[data-theme="chrome-drop"] .cd-newsbar__item {
+  white-space: nowrap;
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #36f06a;
+  text-shadow: 0 0 6px rgba(54, 240, 106, 0.45);
+}
+/* dim diamond seam between quotes, board-style */
+[data-theme="chrome-drop"] .cd-newsbar__item::after {
+  content: "◆";
+  margin-left: 28px;
+  color: rgba(54, 240, 106, 0.4);
+  text-shadow: none;
+}
+[data-theme="chrome-drop"] .cd-newsbar:hover .cd-newsbar__track,
+[data-theme="chrome-drop"] .cd-newsbar:active .cd-newsbar__track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="chrome-drop"] .cd-newsbar__track { animation: none; }
+  [data-theme="chrome-drop"] .cd-newsbar__tag::before { animation: none; }
+}
+
+/* ── Comparison table (Remix vs the usual) ──────────────────────────────── */
+[data-theme="chrome-drop"] .cd-vs__table {
+  margin-top: 28px;
+  border: 1px solid var(--rd-line);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--rd-bg-2);
+}
+[data-theme="chrome-drop"] .cd-vs__row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+}
+[data-theme="chrome-drop"] .cd-vs__row + .cd-vs__row { border-top: 1px solid var(--rd-line); }
+[data-theme="chrome-drop"] .cd-vs__row--head { background: rgba(255, 255, 255, 0.03); padding-block: 18px; }
+[data-theme="chrome-drop"] .cd-vs__brand {
+  font-family: var(--font-sans); font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em;
+  font-size: 1.05rem;
+  background: var(--cd-holo); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: cd-holoshift 7s linear infinite;
+}
+[data-theme="chrome-drop"] .cd-vs__other { text-align: right; color: var(--rd-ink-soft); font-weight: 800; text-transform: uppercase; font-size: 0.88rem; letter-spacing: 0.04em; }
+[data-theme="chrome-drop"] .cd-vs__label {
+  justify-self: center;
+  display: inline-flex; align-items: center;
+  background: var(--cd-magenta); color: #fff;
+  font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 5px 11px; border-radius: 300px; white-space: nowrap;
+  box-shadow: 0 6px 16px -8px rgba(237, 22, 113, 0.7);
+}
+/* the empty middle cell in the header row shouldn't render a pill */
+[data-theme="chrome-drop"] .cd-vs__row--head .cd-vs__label { background: transparent; box-shadow: none; padding: 0; }
+[data-theme="chrome-drop"] .cd-magenta { color: var(--cd-magenta); }
+[data-theme="chrome-drop"] .cd-vs__win { display: inline-flex; align-items: center; gap: 8px; color: #aef5cf; font-weight: 700; font-size: 0.95rem; }
+[data-theme="chrome-drop"] .cd-vs__lose { text-align: right; color: var(--rd-ink-soft); font-size: 0.92rem; }
+[data-theme="chrome-drop"] .cd-vs__ic { flex-shrink: 0; }
+
+/* ── Why people are switching (problems + benefit icons) ────────────────── */
+[data-theme="chrome-drop"] .cd-why { display: grid; gap: 30px; margin-top: 30px; }
+@media (min-width: 820px) { [data-theme="chrome-drop"] .cd-why { grid-template-columns: 1fr 1fr; align-items: center; } }
+[data-theme="chrome-drop"] .cd-why__lead { font-weight: 700; color: #fff; font-size: 1.05rem; }
+[data-theme="chrome-drop"] .cd-problems { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 12px; }
+[data-theme="chrome-drop"] .cd-problems li { display: flex; align-items: flex-start; gap: 12px; color: var(--rd-ink-soft); line-height: 1.4; }
+[data-theme="chrome-drop"] .cd-x {
+  flex-shrink: 0; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%;
+  background: rgba(255, 90, 90, 0.16); color: #ff7a7a;
+}
+[data-theme="chrome-drop"] .cd-x svg { width: 13px; height: 13px; }
+[data-theme="chrome-drop"] .cd-built {
+  position: relative;
+  margin-top: 22px; padding: 20px 22px; border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 34px -10px rgba(160, 140, 255, 0.34);
+}
+
+/* Ambient holo outline — a rounded iridescent ring (edge-only via mask) +
+   soft glow. Shared by the "built differently" box and the what's-inside cards. */
+[data-theme="chrome-drop"] .cd-built::before,
+[data-theme="chrome-drop"] .cd-inside__cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: var(--cd-holo);
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cd-holoshift 9s linear infinite;
+  pointer-events: none;
+}
+[data-theme="chrome-drop"] .cd-built h3 { font-family: var(--font-display); color: #fff; font-size: 1.35rem; }
+[data-theme="chrome-drop"] .cd-built p { margin-top: 8px; color: var(--rd-ink-soft); line-height: 1.55; }
+[data-theme="chrome-drop"] .cd-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 16px; }
+[data-theme="chrome-drop"] .cd-benefit { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+[data-theme="chrome-drop"] .cd-benefit span:last-child { font-weight: 700; font-size: 0.9rem; color: #fff; line-height: 1.25; }
+
+/* holo icon circle (shared by benefits + what's-inside) */
+/* brushed-chrome icon chip — metallic fill, dark glyph, beveled edge */
+[data-theme="chrome-drop"] .cd-ic {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--cd-chrome);
+  background-size: 100% 140%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #14121d;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 -2px 6px rgba(20, 18, 29, 0.45) inset,
+    0 6px 16px -8px rgba(120, 140, 220, 0.5);
+}
+[data-theme="chrome-drop"] .cd-ic svg { width: 20px; height: 20px; }
+[data-theme="chrome-drop"] .cd-ic--lg { width: 64px; height: 64px; }
+[data-theme="chrome-drop"] .cd-ic--lg svg { width: 28px; height: 28px; }
+/* lime-metallic variant (Electrolytes) — "green chrome" */
+[data-theme="chrome-drop"] .cd-ic--lime {
+  background: linear-gradient(176deg, #eaffb0, #D1FE17 52%, #a6d400);
+  color: #14200a;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 -2px 6px rgba(60, 80, 0, 0.4) inset,
+    0 6px 18px -8px rgba(209, 254, 23, 0.6);
+}
+
+/* ── What's inside (4-up cards) ─────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-inside { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; margin-top: 34px; }
+@media (min-width: 860px) { [data-theme="chrome-drop"] .cd-inside { grid-template-columns: repeat(4, 1fr); } }
+[data-theme="chrome-drop"] .cd-inside__cell {
+  position: relative;
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 26px 18px; border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 30px -8px rgba(160, 140, 255, 0.32);
+}
+[data-theme="chrome-drop"] .cd-inside__cell h3 { font-family: var(--font-sans); font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.95rem; color: #fff; }
+[data-theme="chrome-drop"] .cd-inside__cell p { color: var(--rd-ink-soft); font-size: 0.86rem; line-height: 1.5; }
+
+/* ── Flavor feature (2-col image + copy) ────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-feature { display: grid; gap: 30px; align-items: center; }
+@media (min-width: 820px) { [data-theme="chrome-drop"] .cd-feature { grid-template-columns: 0.9fr 1.1fr; } }
+[data-theme="chrome-drop"] .cd-feature__media {
+  border-radius: 22px; overflow: hidden; border: 1px solid var(--rd-line);
+  box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.9);
+  aspect-ratio: 4 / 5;
+}
+[data-theme="chrome-drop"] .cd-feature__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+[data-theme="chrome-drop"] .cd-flavorline {
+  margin-top: 8px; font-family: var(--font-sans); font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em;
+  font-size: 1.1rem;
+  background: var(--cd-holo); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: cd-holoshift 7s linear infinite;
+}
+/* reversed feature (image on the right) on desktop */
+@media (min-width: 820px) {
+  [data-theme="chrome-drop"] .cd-feature--reverse { grid-template-columns: 1.1fr 0.9fr; }
+  [data-theme="chrome-drop"] .cd-feature--reverse .cd-feature__media { order: 2; }
+}
+/* two-button row + secondary (ghost) button */
+[data-theme="chrome-drop"] .cd-feature__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+[data-theme="chrome-drop"] .cd-feature__ctas .rd-cta { width: auto; padding: 0 26px; }
+[data-theme="chrome-drop"] .cd-btn--ghost {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--rd-ink);
+  border: 1.5px solid transparent;
+  border-image: var(--cd-holo) 1;
+  box-shadow: none;
+}
+[data-theme="chrome-drop"] .cd-btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.09);
+  transform: translateY(-2px);
+  filter: none;
+}
+/* compact secondary link inside a store card ("Open in Maps ↗") */
+[data-theme="chrome-drop"] .cd-store__maps {
+  width: auto;
+  min-height: 40px;
+  margin-top: 12px;
+  padding: 0 16px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+/* "Fun facts about {city} ✦" — playful toggle + reveal in the served card */
+[data-theme="chrome-drop"] .cd-funfacts { margin-top: 14px; }
+[data-theme="chrome-drop"] .cd-funfacts__toggle {
+  width: 100%;
+  min-height: 46px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+[data-theme="chrome-drop"] .cd-funfacts__list {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  padding: 16px;
+  border: 1px solid var(--rd-line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="chrome-drop"] .cd-funfacts__list li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--rd-ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+[data-theme="chrome-drop"] .cd-funfacts__list li::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--rd-citron);
+}
+[data-theme="chrome-drop"] .cd-funfacts__wink {
+  color: var(--rd-ink-soft);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+[data-theme="chrome-drop"] .cd-funfacts__wink::before { content: "" !important; }
+
+/* ── Reviews (quote cards) ──────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-reviews { display: grid; gap: 16px; margin-top: 30px; }
+@media (min-width: 760px) { [data-theme="chrome-drop"] .cd-reviews { grid-template-columns: repeat(3, 1fr); } }
+[data-theme="chrome-drop"] .cd-review {
+  display: flex; flex-direction: column; gap: 12px; padding: 24px;
+  border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--rd-line);
+}
+[data-theme="chrome-drop"] .cd-review p { color: #eef1f8; line-height: 1.55; font-size: 0.98rem; }
+[data-theme="chrome-drop"] .cd-review__name { color: var(--rd-ink-soft); font-weight: 700; font-size: 0.85rem; }
+[data-theme="chrome-drop"] .cd-stars { display: inline-flex; gap: 3px; color: var(--rd-citron); }
+[data-theme="chrome-drop"] .cd-stars svg { width: 16px; height: 16px; }
+
+/* ── Serving options (media + body cards) ───────────────────────────────── */
+[data-theme="chrome-drop"] .cd-serve { display: grid; gap: 16px; margin-top: 30px; }
+@media (min-width: 760px) { [data-theme="chrome-drop"] .cd-serve { grid-template-columns: repeat(3, 1fr); } }
+[data-theme="chrome-drop"] .cd-option {
+  border-radius: 18px; overflow: hidden; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--rd-line);
+}
+[data-theme="chrome-drop"] .cd-option__media { aspect-ratio: 4 / 3; overflow: hidden; }
+[data-theme="chrome-drop"] .cd-option__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+[data-theme="chrome-drop"] .cd-option__body { padding: 20px 22px 24px; }
+[data-theme="chrome-drop"] .cd-option__num {
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.68rem; color: var(--rd-citron);
+}
+[data-theme="chrome-drop"] .cd-option__body h3 { font-family: var(--font-display); color: #fff; font-size: 1.4rem; margin: 6px 0 8px; }
+[data-theme="chrome-drop"] .cd-option__body p { color: var(--rd-ink-soft); line-height: 1.5; font-size: 0.92rem; }
+
+/* ── FAQ (native details accordion) ─────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-faq { margin-top: 28px; border-top: 1px solid var(--rd-line); }
+[data-theme="chrome-drop"] .cd-faq details { border-bottom: 1px solid var(--rd-line); }
+[data-theme="chrome-drop"] .cd-faq summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 18px 4px; font-weight: 700; color: #fff; font-size: 1.02rem;
+}
+[data-theme="chrome-drop"] .cd-faq summary::-webkit-details-marker { display: none; }
+[data-theme="chrome-drop"] .cd-faq__sign {
+  flex-shrink: 0; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06); color: var(--rd-citron); font-weight: 700; font-size: 1.1rem; line-height: 1;
+  transition: transform 0.25s var(--rd-ease-overshoot);
+}
+[data-theme="chrome-drop"] .cd-faq details[open] .cd-faq__sign { transform: rotate(45deg); }
+[data-theme="chrome-drop"] .cd-faq__a { padding: 0 4px 20px; color: var(--rd-ink-soft); line-height: 1.6; max-width: 60ch; }
+
+/* ── Final CTA banner ───────────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-final {
+  position: relative; isolation: isolate; overflow: hidden;
+  text-align: center; padding: clamp(52px, 10vw, 120px) 24px;
+}
+[data-theme="chrome-drop"] .cd-final::before {
+  content: ""; position: absolute; inset: 0; z-index: -2;
+  background: url("/images/chrome-drop/paloma-cans.jpg") center / cover no-repeat;
+}
+[data-theme="chrome-drop"] .cd-final::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgba(8, 6, 18, 0.74), rgba(8, 6, 18, 0.6)),
+    radial-gradient(80% 60% at 50% 100%, rgba(150, 130, 255, 0.4), transparent 70%);
+}
+[data-theme="chrome-drop"] .cd-final__h { color: #fff; font-size: clamp(2.2rem, 7vw, 4.2rem); text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6); }
+[data-theme="chrome-drop"] .cd-final__sub { margin: 14px auto 26px; max-width: 38ch; color: rgba(255, 255, 255, 0.9); }
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-foot {
+  border-top: 1px solid var(--rd-line); text-align: center;
+  padding: 36px 24px 52px; color: var(--rd-ink-soft);
+}
+[data-theme="chrome-drop"] .cd-foot__brand {
+  font-family: var(--font-sans); font-weight: 900; letter-spacing: 0.06em; font-size: 1.4rem;
+  background: var(--cd-holo); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* ── Next-drop modal ────────────────────────────────────────────────────── */
+[data-theme="chrome-drop"] .cd-modal__backdrop {
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; place-items: center; padding: 20px;
+  background: rgba(6, 6, 14, 0.66);
+  backdrop-filter: blur(6px);
+  animation: cd-fadein 0.25s ease-out;
+}
+[data-theme="chrome-drop"] .cd-modal__dialog {
+  position: relative;
+  width: 100%; max-width: 440px;
+  background: linear-gradient(180deg, #14151d, #0d0e15);
+  border: 1px solid var(--rd-line);
+  border-radius: 20px;
+  padding: clamp(24px, 5vw, 34px);
+  box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  animation: cd-modalin 0.3s var(--rd-ease-overshoot);
+}
+[data-theme="chrome-drop"] .cd-modal__dialog::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: var(--cd-holo); background-size: 200% 100%;
+  animation: cd-holoshift 6s linear infinite;
+}
+[data-theme="chrome-drop"] .cd-modal__close {
+  position: absolute; top: 12px; right: 12px;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid var(--rd-line);
+  color: var(--rd-ink); font-size: 1.1rem; line-height: 1;
+}
+[data-theme="chrome-drop"] .cd-modal__close:hover { background: rgba(255, 255, 255, 0.12); }
+[data-theme="chrome-drop"] .cd-modal__h { font-family: var(--font-display); color: #fff; font-size: 1.7rem; line-height: 1.04; margin-top: 4px; }
+[data-theme="chrome-drop"] .cd-modal__h em { color: var(--rd-citron); font-style: italic; }
+[data-theme="chrome-drop"] .cd-modal__sub { margin-top: 10px; color: var(--rd-ink-soft); line-height: 1.5; }
+/* hide the reused email form's (empty) heading inside the modal */
+[data-theme="chrome-drop"] .cd-modal__dialog .rd-display:empty { display: none; }
+@keyframes cd-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cd-modalin { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+/* ── Sticky "Don't miss the next drop" disco button ─────────────────────── */
+[data-theme="chrome-drop"] .cd-dropsticky {
+  position: fixed; z-index: 70;
+  left: 50%; bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translate(-50%, 140%);
+  opacity: 0; pointer-events: none;
+  transition: transform 0.45s var(--rd-ease-overshoot), opacity 0.3s ease;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 15px 30px; border-radius: 300px;
+  background: #0c0d15; color: #fff;
+  font-family: var(--font-sans); font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+  font-size: 0.92rem; white-space: nowrap; cursor: pointer; border: none;
+  box-shadow: 0 18px 40px -14px rgba(150, 130, 255, 0.7);
+  isolation: isolate; overflow: hidden;
+}
+[data-theme="chrome-drop"] .cd-dropsticky.cd-dropsticky--show {
+  transform: translate(-50%, 0); opacity: 1; pointer-events: auto;
+}
+/* rotating conic holo border (mask-composite ring) */
+[data-theme="chrome-drop"] .cd-dropsticky::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
+  background: conic-gradient(from 0deg, #8ef6ff, #b69bff, #ff9ee0, #ffd98a, #9dffc6, #8ef6ff);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: cd-spin 4s linear infinite; z-index: -1; pointer-events: none;
+}
+/* shimmer sweep */
+[data-theme="chrome-drop"] .cd-dropsticky::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+  background-size: 220% 100%;
+  animation: cd-shimmer 2.6s ease-in-out infinite 0.6s; pointer-events: none;
+}
+@keyframes cd-shimmer { 0% { background-position: 220% 0; } 100% { background-position: -120% 0; } }
+
+/* ── Reduced motion: kill chrome/holo motion, keep resting look ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="chrome-drop"] .cd-dropsticky,
+  [data-theme="chrome-drop"] .cd-dropsticky::before,
+  [data-theme="chrome-drop"] .cd-dropsticky::after,
+  [data-theme="chrome-drop"] .cd-modal__backdrop,
+  [data-theme="chrome-drop"] .cd-modal__dialog,
+  [data-theme="chrome-drop"] .cd-modal__dialog::before,
+  [data-theme="chrome-drop"] .cd-ticker__track,
+  [data-theme="chrome-drop"] .cd-vs__brand,
+  [data-theme="chrome-drop"] .cd-flavorline,
+  [data-theme="chrome-drop"] .cd-built::before,
+  [data-theme="chrome-drop"] .cd-inside__cell::before,
+  [data-theme="chrome-drop"] .cd-scrollcue,
+  [data-theme="chrome-drop"] .cd-scrollcue__chev,
+  [data-theme="chrome-drop"] .cd-chrome,
+  [data-theme="chrome-drop"] .cd-holoword,
+  [data-theme="chrome-drop"] .cd-chrome .cd-holo,
+  [data-theme="chrome-drop"] .cd-gloss::after,
+  [data-theme="chrome-drop"] .cd-tag,
+  [data-theme="chrome-drop"] .cd-burst,
+  [data-theme="chrome-drop"] .cd-can::before,
+  [data-theme="chrome-drop"] .cd-panel::before {
+    animation: none !important;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   THEME: pocket-pour  ("Pocket Pour" — bright, friendly, mobile-first DTC)
+   A faithful recreation of the pink→violet product-page comp, rebuilt
+   mobile-first. Heavy uppercase poster headlines (Anton), a vivid violet
+   accent carried through icon-circles + the comparison table, soft coral/
+   pink grounds, real cans on a coral→lilac gradient hero. Brand tie kept:
+   the zip check still melts (now violet) on a hit and flips (deep plum) on a
+   miss. Designed at 390px first; widens to 2-col at ≥760px.
+   ═════════════════════════════════════════════════════════════════════════ */
+[data-theme="pocket-pour"] {
+  --rd-bg:        #fffdfb;          /* warm near-white ground */
+  --rd-bg-2:      #fdeef1;          /* soft pink alternating section */
+  --rd-ink:       #2b2433;          /* dark plum-charcoal text */
+  --rd-ink-soft:  #6d6478;          /* muted mauve secondary */
+  --rd-line:      rgba(43, 36, 51, 0.12);
+  --rd-line-soft: rgba(43, 36, 51, 0.06);
+  /* map the shared "action" tokens to VIOLET so .rd-cta / eyebrows / chips
+     adopt the brand purple automatically */
+  --rd-coral:     #7c3aed;
+  --rd-ember:     #6d28d9;
+  --rd-navy:      #4c1d95;          /* unserved flip = deep violet, on-palette */
+  --rd-citron:    #ede9fe;          /* light lavender (flip eyebrow on violet) */
+  --rd-citron-ink:#2b2433;
+  --rd-on-coral:  #ffffff;
+  --rd-radius:    20px;
+  --rd-ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* theme-specific */
+  --pp-violet:      #7c3aed;
+  --pp-violet-deep: #5b21b6;
+  --pp-violet-soft: #efe9ff;        /* icon-circle + highlighted column bg */
+  --pp-pink:        #fde2ea;
+  --pp-pink-deep:   #f7cad9;
+  --pp-green:       #1fa463;
+  --pp-red:         #e0556b;
+  --pp-gold:        #f5a623;        /* review stars */
+  --pp-hero: linear-gradient(168deg,
+    #ffb199 0%, #ff9db0 30%, #f593c3 58%, #d294e4 82%, #b491ec 100%);
+  --pp-final: linear-gradient(135deg,
+    #7c3aed 0%, #9b2fd6 42%, #d6379e 78%, #ff6f91 100%);
+}
+
+/* ── Display = heavy uppercase poster face (Anton); em = violet accent ───── */
+[data-theme="pocket-pour"] .rd-display {
+  font-family: var(--font-poster), var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  line-height: 0.95;
+}
+[data-theme="pocket-pour"] .rd-display em {
+  font-style: normal;
+  color: var(--pp-violet);
+}
+[data-theme="pocket-pour"] .rd-eyebrow { color: var(--pp-violet); }
+[data-theme="pocket-pour"] .rd-lede { color: var(--rd-ink-soft); }
+
+/* CTAs: violet pill, uppercase, friendly bounce */
+[data-theme="pocket-pour"] .rd-cta {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  font-size: 0.98rem;
+  box-shadow: 0 16px 30px -14px color-mix(in srgb, var(--pp-violet) 75%, black);
+}
+[data-theme="pocket-pour"] .rd-field {
+  border-radius: 300px;
+  border-width: 2px;
+}
+/* the served "YOU'RE IN" badge → bright magenta sticker */
+[data-theme="pocket-pour"] .rd-badge {
+  background: #ff4d8d;
+  color: #fff;
+}
+[data-theme="pocket-pour"] .rd-chip {
+  background: var(--pp-violet-soft);
+  color: var(--pp-violet-deep);
+}
+
+/* ── Shell width control: this comp reads as a single tall column ───────── */
+.pp-wrap { max-width: 1000px; margin-inline: auto; padding-inline: 20px; }
+.pp-narrow { max-width: 680px; margin-inline: auto; padding-inline: 20px; }
+
+/* ── Sticky top bar ─────────────────────────────────────────────────────── */
+.pp-header {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, #fff 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rd-line-soft);
+}
+.pp-header__row {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  height: 58px;
+}
+.pp-wordmark {
+  font-family: var(--font-poster), var(--font-sans);
+  font-weight: 400; font-size: 1.6rem; letter-spacing: 0.06em;
+  color: var(--pp-violet); text-align: center; line-height: 1;
+}
+.pp-iconbtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 12px; color: var(--rd-ink);
+  background: none; border: none; cursor: pointer;
+}
+.pp-iconbtn:hover { background: var(--pp-violet-soft); color: var(--pp-violet-deep); }
+
+/* ── HERO ───────────────────────────────────────────────────────────────── */
+.pp-hero {
+  position: relative; overflow: hidden;
+  background: var(--pp-hero);
+}
+/* soft glow blobs to add fruit-photo vibrancy without raster fruit */
+.pp-hero::before, .pp-hero::after {
+  content: ""; position: absolute; border-radius: 50%;
+  filter: blur(60px); opacity: 0.5; pointer-events: none;
+}
+.pp-hero::before { width: 60vw; height: 60vw; top: -18%; left: -16%;
+  background: radial-gradient(circle, #ffd27a, transparent 62%); }
+.pp-hero::after { width: 55vw; height: 55vw; bottom: -22%; right: -14%;
+  background: radial-gradient(circle, #b06bff, transparent 64%); }
+.pp-hero__inner { position: relative; z-index: 1; padding: 30px 20px 8px; }
+.pp-hero__h1 {
+  color: #fff; text-transform: uppercase;
+  font-size: clamp(2.7rem, 13vw, 4.6rem);
+  text-shadow: 0 2px 18px rgba(70, 20, 90, 0.28);
+}
+.pp-hero__sub {
+  color: rgba(255, 255, 255, 0.94); font-weight: 600;
+  font-size: clamp(1.02rem, 4.4vw, 1.25rem); line-height: 1.4;
+  margin-top: 14px; max-width: 30ch;
+}
+/* hero stat chips */
+.pp-statrow { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+.pp-stat {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff; font-weight: 700; font-size: 0.8rem;
+  padding: 8px 13px; border-radius: 300px; backdrop-filter: blur(4px);
+}
+.pp-stat svg { width: 15px; height: 15px; }
+/* hero cans on the gradient (transparent PNGs) */
+.pp-hero__cans {
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 0; margin-top: 18px; padding: 0 8px;
+}
+.pp-hero__cans img { width: 47%; max-width: 230px; height: auto;
+  filter: drop-shadow(0 26px 30px rgba(60, 18, 80, 0.35)); }
+.pp-hero__cans img:first-child { transform: translateX(8%) rotate(-4deg); z-index: 2; }
+.pp-hero__cans img:last-child  { transform: translateX(-8%) rotate(4deg); }
+/* star + social proof row */
+.pp-trust { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.pp-stars { display: inline-flex; gap: 2px; color: var(--pp-gold); }
+.pp-stars svg { width: 17px; height: 17px; }
+.pp-trust__txt { font-weight: 700; font-size: 0.85rem; }
+
+/* generic section rhythm */
+.pp-sec { padding-block: clamp(46px, 9vw, 74px); }
+.pp-sec--pink { background: var(--rd-bg-2); }
+.pp-sec--soft { background: #fbf5ef; }
+.pp-h2 {
+  text-transform: uppercase; color: var(--pp-violet-deep);
+  font-size: clamp(1.9rem, 7vw, 3rem);
+}
+.pp-kicker { /* small uppercase violet eyebrow centered */
+  text-transform: uppercase; letter-spacing: 0.22em; font-weight: 700;
+  font-size: 0.72rem; color: var(--pp-violet);
+}
+
+/* ── Icon circle (the signature) ────────────────────────────────────────── */
+.pp-ic {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--pp-violet-soft); color: var(--pp-violet);
+  border: 1.5px solid color-mix(in srgb, var(--pp-violet) 28%, transparent);
+}
+.pp-ic svg { width: 27px; height: 27px; }
+.pp-ic--lg { width: 66px; height: 66px; }
+.pp-ic--lg svg { width: 32px; height: 32px; }
+
+/* ── "Why switching" : problem list + benefit icon grid ─────────────────── */
+.pp-switch { display: grid; gap: 36px; }
+@media (min-width: 820px) { .pp-switch { grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; } }
+.pp-problems { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 14px; }
+.pp-problems li { display: flex; align-items: flex-start; gap: 11px; font-weight: 600; color: var(--rd-ink); }
+.pp-x {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: color-mix(in srgb, var(--pp-red) 16%, transparent);
+  color: var(--pp-red); display: inline-flex; align-items: center; justify-content: center;
+}
+.pp-x svg { width: 13px; height: 13px; }
+.pp-built {
+  margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--rd-line);
+}
+.pp-built h3 { font-family: var(--font-poster), var(--font-sans); font-weight: 400;
+  text-transform: uppercase; font-size: 1.45rem; color: var(--rd-ink); letter-spacing: 0.01em; }
+.pp-built p { margin-top: 10px; color: var(--rd-ink-soft); line-height: 1.55; }
+/* benefit grid (2-col) */
+.pp-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 18px; }
+.pp-benefit { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.pp-benefit span { font-weight: 700; font-size: 0.92rem; color: var(--rd-ink); line-height: 1.25; }
+
+/* ── Comparison table (THE REMIX DIFFERENCE) ────────────────────────────── */
+.pp-compare { display: grid; gap: 30px; align-items: center; }
+@media (min-width: 860px) { .pp-compare { grid-template-columns: 0.82fr 1.18fr; } }
+.pp-compare__media {
+  border-radius: var(--rd-radius); overflow: hidden; background: var(--pp-violet-soft);
+  box-shadow: 0 30px 60px -38px rgba(70, 20, 90, 0.5);
+}
+.pp-compare__media img { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 4/5; }
+.pp-table {
+  border-radius: var(--rd-radius); overflow: hidden;
+  border: 1px solid var(--rd-line); background: #fff;
+  box-shadow: 0 24px 50px -36px rgba(43, 36, 51, 0.4);
+}
+.pp-table__head {
+  display: grid; grid-template-columns: 1.3fr 1fr 1fr;
+  background: var(--pp-violet-deep); color: #fff;
+}
+.pp-table__head > * { padding: 14px 12px; font-weight: 800; font-size: 0.82rem;
+  text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
+.pp-table__head > *:first-child { text-align: left; }
+.pp-table__head .pp-th-remix { background: #fff; color: var(--pp-violet-deep); }
+.pp-row {
+  display: grid; grid-template-columns: 1.3fr 1fr 1fr; align-items: center;
+  border-top: 1px solid var(--rd-line);
+}
+.pp-row__feat { display: flex; align-items: center; gap: 9px; padding: 13px 12px;
+  font-weight: 700; font-size: 0.85rem; color: var(--rd-ink); }
+.pp-row__feat .pp-ic { width: 32px; height: 32px; border-width: 1px; }
+.pp-row__feat .pp-ic svg { width: 16px; height: 16px; }
+.pp-row__remix { padding: 13px 10px; text-align: center; font-weight: 700; font-size: 0.82rem;
+  color: var(--pp-violet-deep); background: var(--pp-violet-soft); height: 100%;
+  display: flex; align-items: center; justify-content: center; }
+.pp-row__other { padding: 13px 10px; text-align: center; font-size: 0.8rem; color: var(--rd-ink-soft); }
+.pp-betters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; margin-top: 24px; }
+.pp-better { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.85rem; color: var(--pp-violet-deep); }
+.pp-better svg { width: 18px; height: 18px; color: var(--pp-violet); }
+
+/* ── "What's inside" 4-up ───────────────────────────────────────────────── */
+.pp-inside { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 20px; }
+@media (min-width: 820px) { .pp-inside { grid-template-columns: repeat(4, 1fr); } }
+.pp-inside__cell { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pp-inside__cell h3 { font-weight: 800; text-transform: uppercase; font-size: 0.92rem; letter-spacing: 0.03em; color: var(--pp-violet-deep); }
+.pp-inside__cell p { font-size: 0.86rem; color: var(--rd-ink-soft); line-height: 1.5; }
+
+/* ── "Meet your mocktail" feature ───────────────────────────────────────── */
+.pp-feature { display: grid; gap: 28px; align-items: center; }
+@media (min-width: 820px) { .pp-feature { grid-template-columns: 1fr 1fr; } .pp-feature__media { order: 2; } }
+.pp-feature__media { border-radius: var(--rd-radius); overflow: hidden;
+  box-shadow: 0 30px 60px -36px rgba(70, 20, 90, 0.5); }
+.pp-feature__media img { width: 100%; height: auto; display: block; }
+.pp-flavorline { font-family: var(--font-poster), var(--font-sans); font-weight: 400;
+  text-transform: uppercase; color: var(--pp-violet); letter-spacing: 0.02em;
+  font-size: 1.05rem; margin-top: 10px; }
+
+/* ── Reviews ────────────────────────────────────────────────────────────── */
+.pp-reviews { display: grid; gap: 18px; }
+@media (min-width: 760px) { .pp-reviews { grid-template-columns: repeat(3, 1fr); } }
+.pp-review {
+  background: #fff; border: 1px solid var(--rd-line); border-radius: var(--rd-radius);
+  padding: 24px 22px; display: flex; flex-direction: column; gap: 12px;
+  box-shadow: 0 20px 44px -34px rgba(43, 36, 51, 0.35);
+}
+.pp-review p { color: var(--rd-ink); line-height: 1.55; font-size: 0.95rem; flex: 1; }
+.pp-review__name { font-weight: 800; color: var(--pp-violet-deep); font-size: 0.9rem; }
+
+/* ── Serving options ────────────────────────────────────────────────────── */
+.pp-options { display: grid; gap: 22px; }
+@media (min-width: 760px) { .pp-options { grid-template-columns: repeat(3, 1fr); } }
+.pp-option {
+  background: #fff; border: 1px solid var(--rd-line); border-radius: var(--rd-radius);
+  overflow: hidden; box-shadow: 0 20px 44px -34px rgba(43, 36, 51, 0.35);
+  display: flex; flex-direction: column;
+}
+.pp-option__media { aspect-ratio: 4/3; overflow: hidden; background: var(--pp-violet-soft); }
+.pp-option__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pp-option__body { padding: 20px 20px 24px; }
+.pp-option__num { font-family: var(--font-poster), var(--font-sans); font-weight: 400;
+  color: var(--pp-violet); font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.pp-option__body h3 { font-family: var(--font-poster), var(--font-sans); font-weight: 400;
+  text-transform: uppercase; font-size: 1.4rem; color: var(--rd-ink); margin-top: 4px; letter-spacing: 0.01em; }
+.pp-option__body p { margin-top: 8px; color: var(--rd-ink-soft); line-height: 1.5; font-size: 0.9rem; }
+
+/* ── FAQ accordion (native details/summary) ─────────────────────────────── */
+.pp-faq { border-top: 1px solid var(--rd-line); }
+.pp-faq details { border-bottom: 1px solid var(--rd-line); }
+.pp-faq summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 18px 4px; font-weight: 700; color: var(--rd-ink); font-size: 0.98rem;
+}
+.pp-faq summary::-webkit-details-marker { display: none; }
+.pp-faq summary .pp-faq__sign { color: var(--pp-violet); font-size: 1.5rem; line-height: 1;
+  transition: transform 0.25s var(--rd-ease-overshoot); flex-shrink: 0; font-family: var(--font-sans); }
+.pp-faq details[open] summary .pp-faq__sign { transform: rotate(45deg); }
+.pp-faq__a { padding: 0 4px 20px; color: var(--rd-ink-soft); line-height: 1.6; font-size: 0.92rem; max-width: 60ch; }
+
+/* ── Final CTA ──────────────────────────────────────────────────────────── */
+.pp-final {
+  position: relative; overflow: hidden; background: var(--pp-final); color: #fff;
+}
+.pp-final::before { content: ""; position: absolute; width: 60vw; height: 60vw; border-radius: 50%;
+  top: -20%; left: -10%; background: radial-gradient(circle, rgba(255,210,122,0.5), transparent 62%);
+  filter: blur(60px); pointer-events: none; }
+.pp-final__inner { position: relative; z-index: 1; }
+.pp-final .rd-cta { background: #fff; color: var(--pp-violet-deep); }
+.pp-final .rd-cta:hover:not(:disabled) { background: #fff7fb; transform: translateY(-2px); }
+.pp-final__cans { display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+.pp-final__cans img { width: 42%; max-width: 180px; height: auto;
+  filter: drop-shadow(0 22px 26px rgba(40, 10, 60, 0.45)); }
+.pp-final__cans img:first-child { transform: translateX(10%) rotate(-5deg); z-index: 2; }
+.pp-final__cans img:last-child { transform: translateX(-10%) rotate(5deg); }
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.pp-footer { background: #221b2b; color: rgba(255, 255, 255, 0.7); }
+.pp-footer a { color: rgba(255, 255, 255, 0.78); text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+.pp-footer a:hover { color: #fff; }
+.pp-footnav { display: flex; flex-wrap: wrap; gap: 16px 22px; }
+
+/* entrance for the finder result panel sits on shared .rd-* mechanics */
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pp-hero::before, .pp-hero::after, .pp-final::before { animation: none !important; }
+  .pp-faq details[open] summary .pp-faq__sign { transition: none !important; }
+}
+
