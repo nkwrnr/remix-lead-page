@@ -21,47 +21,39 @@ const REDESIGNS: RedesignEntry[] = [
     tagline: "Editorial · archived v1",
     status: "live",
     swatches: ["#f7f1e7", "#e88472", "#16130f", "#e9e034"],
-    note: "The original "Warm Paper" editorial design from launch. Cream paper, Fraunces serif with italic-coral emphasis, coral spot color. Now archived in the lab as a historical reference. The live site is now Chrome Drop.",
+    note: "The original editorial design from launch. Cream paper, Fraunces serif with italic-coral emphasis, coral spot color. Now archived in the lab as a historical reference. The live site is now Chrome Drop.",
   },
   {
     slug: "pocket-pour",
     name: "Pocket Pour",
-    tagline: "Bright mobile-first DTC · pink × violet",
+    tagline: "Bright mobile-first DTC · pink x violet",
     status: "live",
     swatches: ["#ff9db0", "#7c3aed", "#5b21b6", "#fde2ea", "#1fa463"],
-    note: "Faithful recreation of the pink→violet product-page comp, rebuilt mobile-first. Heavy Anton headlines, a violet icon system, REMIX-vs-typical comparison table, serving options, FAQ — with the real zip→email funnel wired into the hero CTA. Generated lifestyle shots from the real cans.",
+    note: "Faithful recreation of the pink-to-violet product-page comp, rebuilt mobile-first. Heavy Anton headlines, a violet icon system, REMIX-vs-typical comparison table, serving options, FAQ. Generated lifestyle shots from the real cans.",
   },
   {
     slug: "velvet-rope",
     name: "Velvet Rope",
-    tagline: "Refined editorial · “Are you in?”",
+    tagline: "Refined editorial · Are you in?",
     status: "live",
     swatches: ["#ffffff", "#e88472", "#ef3d1f", "#2f3a63", "#e9e034"],
     note: "White-forward editorial. Line-reveal hero, oversized pill zip check that melts coral on a hit and flips to navy on a miss.",
   },
   {
     slug: "drop-siren",
-    name: "Drop Siren — v1",
+    name: "Drop Siren - v1",
     tagline: "Maximalist drop-hype · the locked winner",
     status: "live",
     swatches: ["#16130f", "#e88472", "#e9e034", "#ef3d1f"],
-    note: "Dark-ground hype. Drifting aurora, real product can, rotated sticker marquee, coral × citron hover-inversion CTA, melt+flip zip check. The version we locked.",
+    note: "Dark-ground hype. Drifting aurora, real product can, rotated sticker marquee, coral x citron hover-inversion CTA, melt+flip zip check. The version we locked.",
   },
   {
     slug: "drop-siren-v2",
-    name: "Drop Siren — v2",
-    tagline: "“Relentless” · loud & bright",
+    name: "Drop Siren - v2",
+    tagline: "Relentless · loud and bright",
     status: "live",
     swatches: ["#fdf0e1", "#ef5b3c", "#e9e034", "#2f3a63"],
-    note: "Bright, loud & punchy (not dark). A dancing real can with a slapped-on sticker, a vibrant store finder, die-cut sticker callouts, and a REMIX-vs-others battle card split down the middle.",
-  },
-  {
-    slug: "chrome-drop",
-    name: "Chrome Drop",
-    tagline: "“Liquid Chrome Hype” · drop-culture",
-    status: "live",
-    swatches: ["#0a0b10", "#8ef6ff", "#b69bff", "#ff9ee0", "#ef6a4d"],
-    note: "Hypebeast drop-culture slice. Liquid-chrome display type, holographic iridescent accents, a spinning sticker burst, and the zip check framed as a “drop unlock.” Hero + zip-check prototype — building out if the look lands.",
+    note: "Bright, loud and punchy (not dark). A dancing real can with a slapped-on sticker, a vibrant store finder, die-cut sticker callouts, and a REMIX-vs-others battle card split down the middle.",
   },
 ];
 
@@ -79,7 +71,7 @@ export default function RedesignGallery() {
           Fully-functional redesigns of the Remix lead page, each isolated under
           its own theme. The live <code>/</code> is now Chrome Drop (promoted from
           the lab). <code>/genie</code> is also live. Pick a lab variant to walk
-          the real zip → email flow, or compare against the current builds below.
+          the real zip to email flow, or compare against the current builds below.
         </p>
 
         <div
@@ -140,7 +132,7 @@ export default function RedesignGallery() {
                   className="rd-eyebrow"
                   style={{ marginTop: "auto", color: r.status === "live" ? "var(--rd-ember)" : "var(--rd-ink-soft)" }}
                 >
-                  {r.status === "live" ? "Open redesign →" : "In progress"}
+                  {r.status === "live" ? "Open redesign arrow" : "In progress"}
                 </span>
               </div>
             );
@@ -157,8 +149,8 @@ export default function RedesignGallery() {
 
         <p style={{ marginTop: 40, fontSize: "0.78rem", color: "var(--rd-ink-soft)" }}>
           Compare against the current build:{" "}
-          <Link href="/" className="rd-textlink">live “/” editorial</Link> ·{" "}
-          <Link href="/genie" className="rd-textlink">live “/genie”</Link>
+          <Link href="/" className="rd-textlink">live / Chrome Drop</Link> ·{" "}
+          <Link href="/genie" className="rd-textlink">live /genie</Link>
         </p>
       </div>
     </div>
