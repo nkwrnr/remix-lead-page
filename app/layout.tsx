@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, Anton } from "next/font/google";
+import { Fraunces, Inter, Anton, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
 // Editorial display face — high-contrast serif with optical sizing; italics carry
@@ -23,6 +23,14 @@ const poster = Anton({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-poster",
+});
+
+// 8-bit pixel face — used only for the retro stock-ticker board on the live page.
+const pixel = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-pixel",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -60,7 +68,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${poster.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} ${poster.variable} ${pixel.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
         {children}
