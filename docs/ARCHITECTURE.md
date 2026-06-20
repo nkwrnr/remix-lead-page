@@ -47,7 +47,7 @@ One interface, swappable implementations, chosen by the `LEAD_BACKEND` env var. 
 - `store.ts` — `LeadStore` interface (`save`, `list`) + `makeId()`
 - `local.ts` — **LocalStore** (SQLite at `data/leads.db`). **Dev/QA only** — `better-sqlite3` cannot write on a serverless (read-only) filesystem, so it is **never used in production**. Opt in explicitly via `LEAD_BACKEND=local`; it is *not* auto-included.
 - `supabase.ts` — **SupabaseStore** (Postgres via PostgREST HTTPS; serverless-safe; the **production primary / source-of-truth**). Uses `NEXT_PUBLIC_SUPABASE_URL` + server-only `SUPABASE_SECRET_KEY`; no-ops safely if unset.
-- `klaviyo.ts` — **KlaviyoStore** (profile-import + list subscribe; no-ops safely if `KLAVIYO_API_KEY` unset)
+- `klaviyo.ts` — **KlaviyoStore** (profile-import with zip/UTM/store props, then subscribe to the Klaviyo list with `consent: SUBSCRIBED`; no-ops safely if `KLAVIYO_API_KEY` unset). Live list: **"Email Optin - Remix Launch Page" (`KLAVIYO_LIST_ID=X2ayZW`, single opt-in)**. Best-effort in the fan-out — a Klaviyo failure never blocks a signup.
 - `airtable.ts` — **AirtableStore** (raw row append; no-ops safely if creds unset)
 - `multi.ts` — **MultiStore** (fan-out; primary write must succeed, rest best-effort)
 - `factory.ts` — `getLeadStore()` builds from `LEAD_BACKEND` (`local` default for dev; **`supabase+klaviyo` for prod**). Builds only the adapters named in the spec, in order.
