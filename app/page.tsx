@@ -116,9 +116,9 @@ const TABLE = [
 ];
 
 const INSIDE = [
-  { icon: <Leaf />, h: "Real Fruit Juice", p: "Flavor that starts in an orchard, not a lab. Real fruit, first ingredient, no funny business." },
-  { icon: <Leaf />, h: "Natural Ingredients", p: "Nothing artificial. No mystery flavors. Just stuff you can pronounce." },
-  { icon: <Bolt />, h: "Electrolytes", p: "Packed with electrolytes so tomorrow-you feels as good as tonight-you.", lime: true },
+  { icon: <Leaf />, h: "Real Fruit Juice", p: "Real juice. Real flavor. No artificial stuff getting in the way." },
+  { icon: <Leaf />, h: "Natural Ingredients", p: "Nothing artificial. No mystery flavors. Just ridiculously good taste." },
+  { icon: <Bolt />, h: "Electrolytes", p: "We pack in electrolytes so tomorrow-you feels just as good as tonight-you.", lime: true },
   { icon: <Cube />, h: "Low Sugar", p: "Three grams of sugar. We made a drink, not a dessert." },
 ];
 
