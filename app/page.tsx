@@ -383,7 +383,7 @@ export default function ChromeDropPage() {
             </ul>
             <div className="cd-built">
               <h3>Remix is built different.</h3>
-              <p>The flavor, ritual, and experience of a great cocktail 🤌 without the alcohol, the calories, or the regret. Sip it straight or Spike it with your fav spirit. <span className="cd-accent">Your call boo.</span> 😘</p>
+              <p>The flavor, ritual, and experience of a great cocktail — without the alcohol, the calories, or the regret. Sip it straight or Spike it with your fav spirit. <span className="cd-accent">Your call boo.</span></p>
             </div>
           </div>
           <div className="cd-benefits">
