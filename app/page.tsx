@@ -246,7 +246,7 @@ export default function ChromeDropPage() {
                   className="rd-field"
                 />
                 <button type="submit" disabled={f.lookingUp} className="rd-cta">
-                  {f.lookingUp ? "Checking…" : "Summon My Remix →"}
+                  {f.lookingUp ? "Checking…" : "Gimme that Remix →"}
                 </button>
               </form>
               {f.zipError && (
@@ -383,7 +383,7 @@ export default function ChromeDropPage() {
             </ul>
             <div className="cd-built">
               <h3>Remix is built different.</h3>
-              <p>The flavor, ritual, and experience of a great cocktail — without the alcohol, the calories, or the regret.</p>
+              <p>The flavor, ritual, and experience of a great cocktail 🤌 without the alcohol, the calories, or the regret. Sip it straight or Spike it with your fav spirit. <span className="cd-accent">Your call boo.</span> 😘</p>
             </div>
           </div>
           <div className="cd-benefits">
@@ -445,8 +445,8 @@ export default function ChromeDropPage() {
             <h2 className="cd-h2">Muddled Berry Mojito</h2>
             <p className="cd-flavorline">Blackberry · Lime · Mint</p>
             <p className="rd-lede" style={{ marginTop: 14 }}>
-              Deep, dark, and a little dangerous. Sip it straight or build it into
-              something taller. 0.0% ABV, under 20 calories, 3g sugar.
+              Deep, dark, and a little dangerous. Sip it straight or spike it your
+              way. 0.0% ABV, under 20 calories, 3g sugar.
             </p>
             <div className="cd-feature__ctas">
               <button
@@ -479,7 +479,8 @@ export default function ChromeDropPage() {
             <p className="cd-flavorline">Grapefruit · Lime</p>
             <p className="rd-lede" style={{ marginTop: 14 }}>
               Bright, tart, ridiculously easy. The one that disappears first at the
-              party. 0.0% ABV, under 20 calories, 3g sugar.
+              party. Good straight from the can. Great with tequila. 0.0% ABV, under
+              20 calories, 3g sugar.
             </p>
             <div className="cd-feature__ctas">
               <button

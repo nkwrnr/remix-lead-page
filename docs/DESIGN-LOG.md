@@ -6,6 +6,17 @@ Format: `## YYYY-MM-DD — title` → what changed · why · files.
 
 ---
 
+## 2026-06-19 — Live Chrome Drop: copy pass + consent checkbox → notice line
+
+Copy refinements on `app/page.tsx` + a consent-UX change in `components/redesign/RedesignEmailForm.tsx`. Build + 58 unit tests green; each spot screenshot-verified; submit path re-verified end-to-end (lead row saves with `consent=1`, `consentVersion`, timestamp).
+
+- **Zip button:** "Summon My Remix →" → **"Gimme that Remix →"**.
+- **"Remix is built different" subtitle** rewritten with a voicier line + emoji (🤌 / 😘) and a green-serif flourish: **"Your call boo."** wrapped in a new `.cd-accent` span (`font-family: var(--font-display)` + italic + `var(--rd-citron)`, **size inherited** — mirrors the `.cd-h2 em` accent). Per user: replaced the single existing paragraph; no "craft bartender" body added.
+- **Flavor bodies:** Mojito "…build it into something taller" → "…spike it your way"; Paloma "+Good straight from the can. Great with tequila." appended.
+- **Final CTA:** "the next one" now lime-green italic via a new `.cd-final__h em` rule (the rule didn't exist, so it rendered white).
+- **Store count:** confirmed **161** is correct — `../remix-store-locations.xlsx` = 258 store+SKU rows → 161 unique stores (matches `served-zips.json`); no "181" in data/repo. No change.
+- **Consent checkbox → notice line.** Replaced the gated consent checkbox with a non-blocking **italic notice** ("By submitting, you agree to receive the coolest drop emails from us." + `/privacy` link) and now always send `consent: true`. Rationale: CAN-SPAM is opt-out, single opt-in needs no checkbox, a notice converts better, and `consent`/`consentVersion`/`createdAt` are still logged server-side as proof (schema `consent: z.boolean()` unchanged; route.ts unchanged). Applies to served/unserved/`NextDropModal` (shared form). e2e specs unaffected — they target warm-paper/`/genie` which use the v1 `EmailCapture` (its own checkbox, untouched).
+
 ## 2026-06-19 — Live Chrome Drop: holo served-state, finder fixes, "breaking news" crawl, Maps + area-facts
 
 Served-state + finder polish pass on the live `/` (Chrome Drop), all scoped to `[data-theme="chrome-drop"]`; `/genie` and tests untouched. `npx next build` + `npm test` (38) green; verified by cropped screenshots at iPhone-13 + desktop.

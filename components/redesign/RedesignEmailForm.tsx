@@ -24,7 +24,6 @@ export function RedesignEmailForm({
   tone?: "light" | "dark";
 }) {
   const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(false);
   const [localErr, setLocalErr] = useState<string | null>(null);
   const honeypot = useRef<HTMLInputElement>(null);
 
@@ -34,12 +33,10 @@ export function RedesignEmailForm({
       setLocalErr("Please enter a valid email address.");
       return;
     }
-    if (!consent) {
-      setLocalErr("Please check the box to join the list.");
-      return;
-    }
     setLocalErr(null);
-    onSubmit({ email, consent, website: honeypot.current?.value || "" });
+    // Single opt-in: submitting IS the consent action (CAN-SPAM is opt-out, no
+    // checkbox required). Consent + consentVersion + timestamp are logged server-side.
+    onSubmit({ email, consent: true, website: honeypot.current?.value || "" });
   }
 
   const shownErr = localErr || error;
@@ -80,34 +77,17 @@ export function RedesignEmailForm({
         </button>
       </div>
 
-      <label
+      <p
         className="mt-3"
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 8,
-          fontSize: "0.75rem",
-          color: subColor,
-          cursor: "pointer",
-        }}
+        style={{ fontSize: "0.72rem", fontStyle: "italic", color: subColor }}
       >
-        <input
-          type="checkbox"
-          checked={consent}
-          disabled={submitting}
-          onChange={(e) => setConsent(e.target.checked)}
-          style={{ marginTop: 2, width: 16, height: 16, flexShrink: 0 }}
-        />
-        <span>
-          Yes, send me Remix drops, restocks, and the occasional good time. By
-          joining you agree to receive marketing emails from Remix. Unsubscribe
-          anytime. See our{" "}
-          <a href="/privacy" className="rd-textlink">
-            privacy policy
-          </a>
-          .
-        </span>
-      </label>
+        By submitting, you agree to receive the coolest drop emails from us. See
+        our{" "}
+        <a href="/privacy" className="rd-textlink">
+          privacy policy
+        </a>
+        .
+      </p>
 
       {shownErr && (
         <p role="alert" className="mt-2" style={{ fontSize: "0.85rem", color: tone === "dark" ? "#ffd9cf" : "var(--rd-ember)" }}>
