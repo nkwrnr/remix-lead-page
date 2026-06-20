@@ -6,6 +6,23 @@ Format: `## YYYY-MM-DD — title` → what changed · why · files.
 
 ---
 
+## 2026-06-20 — Live Chrome Drop: "What's inside every can?" copy + one-line finder headline
+
+- **"What's inside" cards** (`INSIDE` array, `app/page.tsx`): punchier bodies on three of four — Real Fruit Juice → "Real juice. Real flavor. No artificial stuff getting in the way."; Natural Ingredients → "Nothing artificial. No mystery flavors. Just ridiculously good taste."; Electrolytes → "We pack in electrolytes so tomorrow-you feels just as good as tonight-you." Labels, headline, icons, and Low Sugar unchanged.
+- **Finder headline** "Are we in your city?" sized down to one line (`clamp(1.3rem, 5.6vw, 2.4rem)` + `white-space: nowrap` on `.cd-chrome--finder`) — was wrapping to two lines on mobile.
+
+## 2026-06-19 — PostHog product analytics + tracking facade
+
+Added a client analytics layer so we can see — as a growth PM — which buttons get clicked down to the lowest click, where people snag, and what they don't scroll to on mobile, **without slowing the page**. Built on the existing provider-agnostic tracking facade (mirrors the Meta Pixel adapter), so no funnel rewrites. Verification: typecheck + **58 unit** (incl. new `lib/tracking/posthog.test.ts`) + **9 e2e** green; a live event smoke on a 390px viewport captured the full taxonomy firing (Launch, all 10 `section_viewed`, `cta_clicked`, `modal_opened/closed` with `mojito`/`paloma` source, `faq_opened`, `zip_submit_failed`, and rich `zip_submitted {storeCount, city, state}`).
+
+- **PostHog adapter** (`lib/tracking/posthog.ts`) alongside Meta Pixel, both behind `lib/tracking/index.ts`. **Lean config:** autocapture off, session replay off, surveys off, `identified_only` — the heavy posthog-js chunks never load. `email_submitted` does `identify(email)` so the zip→email funnel stays intact across the anonymous→identified merge.
+- **Growth taxonomy** (`lib/tracking/types.ts`, doc'd in `docs/ANALYTICS.md`): few event names, detail in properties — `cta_clicked {cta,section}`, `section_viewed`, `zip_submitted`/`zip_submit_failed`, `email_submitted`/`email_submit_failed` (carries the attempted `email` for recovery), `modal_opened/closed`, `faq_opened`. Adding a button later = one new `cta` value, no new event name.
+- **Reverse proxy** (`next.config.ts` rewrites → same-origin `/ingest/*`): ad-blocker resilient and needs **no new CSP domains**. Why: the existing CSP is strict; proxying keeps it untouched.
+- **Dev console debug provider** (`lib/tracking/debug.ts`) — every event logs to the console even with no PostHog key, so the taxonomy is testable before any account exists.
+- **Scroll depth** via `components/tracking/SectionTracker.tsx` (one IntersectionObserver/section, fires once). **Genie** (`components/genie/GenieExperience.tsx`) instrumented directly — it has its own state machine, not `useFunnel`. `NextDropModal` now reports email events (it previously dropped every buy-intent conversion).
+- **Starter dashboard** as code: `scripts/posthog-dashboard.mjs` + `npm run analytics:dashboard` (funnel, zip volume, conversions-by-path, scroll-by-device, goal-line failures). Needs a `POSTHOG_PERSONAL_API_KEY` (the public `phc_` key can't write dashboards).
+- Files: `lib/tracking/*`, `components/tracking/*`, `app/page.tsx` + `app/genie/page.tsx` (mount + CTA/FAQ/section hooks), `components/redesign/{useFunnel,StoreCards,StickyDropCta,NextDropModal}.tsx`, `next.config.ts`, `.env.example`, `docs/ANALYTICS.md`. Kill switch: `NEXT_PUBLIC_TRACKING_ENABLED=false`.
+
 ## 2026-06-19 — Live Chrome Drop: copy pass + consent checkbox → notice line
 
 Copy refinements on `app/page.tsx` + a consent-UX change in `components/redesign/RedesignEmailForm.tsx`. Build + 58 unit tests green; each spot screenshot-verified; submit path re-verified end-to-end (lead row saves with `consent=1`, `consentVersion`, timestamp).
