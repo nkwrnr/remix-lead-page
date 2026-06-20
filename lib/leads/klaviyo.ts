@@ -8,7 +8,10 @@ import { makeId, type LeadStore } from "./store";
  *
  * Docs: create-or-update profile, then subscribe-profiles for consent.
  */
-const KLAVIYO_REVISION = "2024-10-15";
+// Klaviyo dates its API; bump as Klaviyo deprecates. Verified against the live
+// "Email Optin - Remix Launch Page" list (single opt-in) — profile-import +
+// subscribe both accept application/json at this revision.
+const KLAVIYO_REVISION = "2025-07-15";
 
 export class KlaviyoStore implements LeadStore {
   readonly name = "klaviyo";
@@ -51,6 +54,8 @@ export class KlaviyoStore implements LeadStore {
               utm_source: lead.utmSource,
               utm_medium: lead.utmMedium,
               utm_campaign: lead.utmCampaign,
+              utm_content: lead.utmContent,
+              utm_term: lead.utmTerm,
               zip_entered: lead.zip,
               page_variant: lead.pageVariant,
             },
