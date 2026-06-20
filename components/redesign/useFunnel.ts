@@ -65,6 +65,12 @@ export function useFunnel(pageVariant: string) {
       const result = await findStores(zipInput);
       if (result.status === "invalid") {
         setZipError("Please enter a valid 5-digit zip code.");
+        try {
+          tracking.zipSubmitFailed({
+            reason: zipInput.trim() === "" ? "empty" : "invalid_format",
+            zipAttempted: zipInput,
+          });
+        } catch { /* non-blocking */ }
         return;
       }
       if (result.status === "served") {
@@ -74,7 +80,15 @@ export function useFunnel(pageVariant: string) {
         setPath("served");
         setPhase("served");
         rememberZip(result.zip);
-        try { tracking.submitZip({ zip: result.zip, served: true }); } catch { /* non-blocking */ }
+        try {
+          tracking.submitZip({
+            zip: result.zip,
+            served: true,
+            storeCount: result.stores.length,
+            city: result.stores[0]?.city ?? null,
+            state: result.stores[0]?.state ?? null,
+          });
+        } catch { /* non-blocking */ }
         recordZipSubmit({
           zip: result.zip,
           served: true,
@@ -116,6 +130,10 @@ export function useFunnel(pageVariant: string) {
   async function handleEmail({ email, consent, website }: EmailSubmit) {
     setSubmitting(true);
     setSubmitError(null);
+    const matchedStore = stores[0]
+      ? `Walmart #${stores[0].storeNumber}, ${stores[0].city}, ${stores[0].state}`
+      : null;
+    const interest = phase === "served" ? productInterest(stores) : "unset";
     try {
       const res = await fetch(API_ROUTE, {
         method: "POST",
@@ -126,10 +144,8 @@ export function useFunnel(pageVariant: string) {
           website,
           path,
           zip,
-          matchedStore: stores[0]
-            ? `Walmart #${stores[0].storeNumber}, ${stores[0].city}, ${stores[0].state}`
-            : null,
-          productInterest: phase === "served" ? productInterest(stores) : "unset",
+          matchedStore,
+          productInterest: interest,
           formLoadedAt: formLoadedAt.current,
           referrer: typeof document !== "undefined" ? document.referrer || null : null,
           pageVariant,
@@ -145,12 +161,34 @@ export function useFunnel(pageVariant: string) {
       const json = await res.json();
       if (json.ok) {
         setPhase("success");
-        try { tracking.submitEmail({ email, zip, path }); } catch { /* non-blocking */ }
+        try {
+          tracking.submitEmail({
+            email,
+            zip,
+            path,
+            source: "inline",
+            served: phase === "served",
+            matchedStore,
+            productInterest: interest,
+          });
+        } catch { /* non-blocking */ }
       } else {
         setSubmitError(json.message || "Something went wrong. Please try again.");
+        try {
+          tracking.emailSubmitFailed({
+            reason: res.status === 429 ? "rate_limited" : res.status >= 500 ? "server_error" : "validation",
+            email,
+            path,
+            source: "inline",
+            zip,
+          });
+        } catch { /* non-blocking */ }
       }
     } catch {
       setSubmitError("Network error. Please try again.");
+      try {
+        tracking.emailSubmitFailed({ reason: "network", email, path, source: "inline", zip });
+      } catch { /* non-blocking */ }
     } finally {
       setSubmitting(false);
     }

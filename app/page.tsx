@@ -9,6 +9,9 @@ import { RemixImg } from "@/components/redesign/RemixImg";
 import { NextDropModal } from "@/components/redesign/NextDropModal";
 import { StickyDropCta } from "@/components/redesign/StickyDropCta";
 import { TrackingProvider } from "@/components/tracking/TrackingProvider";
+import { SectionTracker } from "@/components/tracking/SectionTracker";
+import { tracking } from "@/lib/tracking";
+import type { ModalSource } from "@/lib/tracking/types";
 import { AREA_FACTS, FALLBACK_FACTS } from "@/lib/area-facts";
 import "./redesign/redesign.css";
 
@@ -144,12 +147,26 @@ export default function ChromeDropPage() {
   const f = useFunnel(VARIANT);
   const [buyOpen, setBuyOpen] = useState(false);
   const [factsOpen, setFactsOpen] = useState(false);
+  // Remember which surface opened the next-drop modal so modal_opened/closed
+  // and the modal's email_submitted all carry a consistent `source`.
+  const [modalSource, setModalSource] = useState<ModalSource>("sticky");
+
+  const openModal = (source: ModalSource) => {
+    setModalSource(source);
+    tracking.modalOpen({ source });
+    setBuyOpen(true);
+  };
+  const closeModal = () => {
+    tracking.modalClose({ source: modalSource });
+    setBuyOpen(false);
+  };
 
   return (
     <main data-theme="chrome-drop" className="rd-root cd-page">
       <TrackingProvider pageVariant={VARIANT} />
       {/* ── HERO — full-bleed lifestyle photo, text at top, die-cut stickers ── */}
       <section className="cd-hero">
+        <SectionTracker section="hero" index={0} />
         <div className="cd-hero__top">
           <p className="rd-eyebrow" style={{ color: "var(--rd-citron)" }}>
             Mocktail · Electrolyte · Mixer
@@ -199,6 +216,7 @@ export default function ChromeDropPage() {
 
       {/* ── THE UNLOCK (zip-check) ──────────────────────────────────── */}
       <section id="unlock" className="rd-shell" style={{ paddingTop: 8, paddingBottom: "clamp(48px, 8vw, 96px)", scrollMarginTop: 24 }}>
+        <SectionTracker section="zip_finder" index={1} />
         <div className="cd-panel" style={{ maxWidth: 580, margin: "0 auto", padding: "clamp(24px, 5vw, 40px)" }}>
           {f.phase === "idle" && (
             <>
@@ -238,7 +256,10 @@ export default function ChromeDropPage() {
               )}
               <button
                 type="button"
-                onClick={f.handleSkip}
+                onClick={() => {
+                  tracking.ctaClick({ cta: "skip_browsing", section: "zip_finder" });
+                  f.handleSkip();
+                }}
                 className="rd-textlink"
                 style={{ marginTop: 14, fontSize: "0.85rem", background: "none", border: "none", cursor: "pointer" }}
               >
@@ -264,7 +285,10 @@ export default function ChromeDropPage() {
                       type="button"
                       className="rd-cta cd-btn--ghost cd-funfacts__toggle"
                       aria-expanded={factsOpen}
-                      onClick={() => setFactsOpen((o) => !o)}
+                      onClick={() => {
+                        tracking.ctaClick({ cta: "fun_facts_toggle", section: "zip_finder" });
+                        setFactsOpen((o) => !o);
+                      }}
                     >
                       {factsOpen ? "Hide the fun facts" : `Fun facts about ${f.city}`} ✦
                     </button>
@@ -347,6 +371,7 @@ export default function ChromeDropPage() {
 
       {/* ── Why people are switching ────────────────────────────────── */}
       <section className="rd-shell cd-section">
+        <SectionTracker section="why_switch" index={2} />
         <h2 className="cd-h2" style={{ maxWidth: "14ch" }}>Why everyone keeps <em>switching.</em></h2>
         <div className="cd-why">
           <div>
@@ -374,6 +399,7 @@ export default function ChromeDropPage() {
 
       {/* ── Remix vs a typical mixer (comparison) ───────────────────── */}
       <section className="rd-shell cd-section" style={{ maxWidth: 760 }}>
+        <SectionTracker section="comparison" index={3} />
         <p className="rd-eyebrow" style={{ textAlign: "center" }}>The Remix difference</p>
         <h2 className="cd-h2" style={{ textAlign: "center" }}>Remix <em>vs.</em> a typical mixer.</h2>
         <div className="cd-vs__table">
@@ -394,6 +420,7 @@ export default function ChromeDropPage() {
 
       {/* ── What's inside every can ─────────────────────────────────── */}
       <section className="rd-shell cd-section">
+        <SectionTracker section="inside" index={4} />
         <h2 className="cd-h2" style={{ textAlign: "center" }}>What&apos;s <em>inside</em> every can?</h2>
         <div className="cd-inside">
           {INSIDE.map((c) => (
@@ -408,6 +435,7 @@ export default function ChromeDropPage() {
 
       {/* ── Flavor feature — Muddled Berry Mojito ───────────────────── */}
       <section className="rd-shell cd-section">
+        <SectionTracker section="flavors" index={5} />
         <div className="cd-feature">
           <div className="cd-feature__media">
             <RemixImg src="/images/chrome-drop/mojito-2.jpg" alt="Remix Muddled Berry Mojito poured over ice with blackberries and mint" width={1040} height={1300} sizes="(max-width: 820px) 90vw, 440px" />
@@ -421,10 +449,17 @@ export default function ChromeDropPage() {
               something taller. 0.0% ABV, under 20 calories, 3g sugar.
             </p>
             <div className="cd-feature__ctas">
-              <button type="button" className="rd-cta cd-btn--ghost" onClick={scrollToTop}>
+              <button
+                type="button"
+                className="rd-cta cd-btn--ghost"
+                onClick={() => {
+                  tracking.ctaClick({ cta: "find_near_me", section: "flavors" });
+                  scrollToTop();
+                }}
+              >
                 Find it near me →
               </button>
-              <button type="button" className="rd-cta" onClick={() => setBuyOpen(true)}>
+              <button type="button" className="rd-cta" onClick={() => openModal("mojito")}>
                 Buy it →
               </button>
             </div>
@@ -447,10 +482,17 @@ export default function ChromeDropPage() {
               party. 0.0% ABV, under 20 calories, 3g sugar.
             </p>
             <div className="cd-feature__ctas">
-              <button type="button" className="rd-cta cd-btn--ghost" onClick={scrollToTop}>
+              <button
+                type="button"
+                className="rd-cta cd-btn--ghost"
+                onClick={() => {
+                  tracking.ctaClick({ cta: "find_near_me", section: "flavors" });
+                  scrollToTop();
+                }}
+              >
                 Find it near me →
               </button>
-              <button type="button" className="rd-cta" onClick={() => setBuyOpen(true)}>
+              <button type="button" className="rd-cta" onClick={() => openModal("paloma")}>
                 Buy it →
               </button>
             </div>
@@ -460,6 +502,7 @@ export default function ChromeDropPage() {
 
       {/* ── Reviews ─────────────────────────────────────────────────── */}
       <section className="rd-shell cd-section">
+        <SectionTracker section="reviews" index={6} />
         <h2 className="cd-h2" style={{ textAlign: "center" }}>Why people <em>love</em> Remix.</h2>
         <div className="cd-reviews">
           {REVIEWS.map((r) => (
@@ -474,6 +517,7 @@ export default function ChromeDropPage() {
 
       {/* ── Three ways to Remix (serving options) ───────────────────── */}
       <section className="rd-shell cd-section">
+        <SectionTracker section="serve" index={7} />
         <h2 className="cd-h2" style={{ textAlign: "center" }}>Three ways to <em>Remix.</em></h2>
         <div className="cd-serve">
           {OPTIONS.map((o) => (
@@ -493,10 +537,18 @@ export default function ChromeDropPage() {
 
       {/* ── FAQ ─────────────────────────────────────────────────────── */}
       <section className="rd-shell cd-section" style={{ maxWidth: 720 }}>
+        <SectionTracker section="faq" index={8} />
         <h2 className="cd-h2" style={{ textAlign: "center" }}>Questions? <em>Answered.</em></h2>
         <div className="cd-faq">
-          {FAQS.map((item) => (
-            <details key={item.q}>
+          {FAQS.map((item, i) => (
+            <details
+              key={item.q}
+              onToggle={(e) => {
+                if ((e.currentTarget as HTMLDetailsElement).open) {
+                  tracking.faqOpen({ question: item.q, index: i });
+                }
+              }}
+            >
               <summary>{item.q}<span className="cd-faq__sign" aria-hidden>+</span></summary>
               <p className="cd-faq__a">{item.a}</p>
             </details>
@@ -506,6 +558,7 @@ export default function ChromeDropPage() {
 
       {/* ── Final CTA banner (Margarita) ────────────────────────────── */}
       <section className="cd-final">
+        <SectionTracker section="final_cta" index={9} />
         <h2 className="cd-final__h rd-display">
           Don&apos;t miss <em>the next one.</em>
         </h2>
@@ -513,7 +566,12 @@ export default function ChromeDropPage() {
           A new online drop lands in days — and it&apos;ll sell out fast. The list
           hears first. Drop your zip and you&apos;re in.
         </p>
-        <a href="#unlock" className="rd-cta" style={{ width: "auto", padding: "0 34px" }}>
+        <a
+          href="#unlock"
+          className="rd-cta"
+          style={{ width: "auto", padding: "0 34px" }}
+          onClick={() => tracking.ctaClick({ cta: "final_drop_zip", section: "final_cta" })}
+        >
           Drop your zip →
         </a>
       </section>
@@ -528,8 +586,8 @@ export default function ChromeDropPage() {
       </footer>
 
       {/* sticky disco CTA + shared next-drop modal */}
-      <StickyDropCta onOpen={() => setBuyOpen(true)} />
-      <NextDropModal open={buyOpen} onClose={() => setBuyOpen(false)} />
+      <StickyDropCta onOpen={() => openModal("sticky")} />
+      <NextDropModal open={buyOpen} onClose={closeModal} />
     </main>
   );
 }

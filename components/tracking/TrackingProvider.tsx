@@ -16,9 +16,17 @@
  */
 
 import { useEffect, useRef } from "react";
-import { getMetaPixelId, isTrackingEnabled } from "@/lib/tracking/config";
+import {
+  getMetaPixelId,
+  getPostHogConfig,
+  isTrackingEnabled,
+} from "@/lib/tracking/config";
 import { createMetaPixelProvider } from "@/lib/tracking/meta-pixel";
-import { tracking } from "@/lib/tracking";
+import { createPostHogProvider } from "@/lib/tracking/posthog";
+import { createDebugProvider } from "@/lib/tracking/debug";
+import { tracking, type TrackingProvider as Provider } from "@/lib/tracking";
+
+const isDev = process.env.NODE_ENV !== "production";
 
 export interface TrackingProviderProps {
   /** Identifies the page variant in the Launch event (e.g. `"redesign_chrome_drop"`). */
@@ -39,10 +47,21 @@ export function TrackingProvider({ pageVariant }: TrackingProviderProps): null {
     if (!isTrackingEnabled()) return;
 
     // Build the provider list from environment config.
-    const providers = [];
+    const providers: Provider[] = [];
+
     const metaPixelId = getMetaPixelId();
     if (metaPixelId !== null) {
       providers.push(createMetaPixelProvider(metaPixelId));
+    }
+
+    const posthogConfig = getPostHogConfig();
+    if (posthogConfig !== null) {
+      providers.push(createPostHogProvider(posthogConfig.key, posthogConfig.host));
+    }
+
+    // Dev-only: log every event to the console (works even with no PostHog key).
+    if (isDev) {
+      providers.push(createDebugProvider());
     }
 
     // Register + initialise all providers (idempotent).

@@ -39,3 +39,24 @@ export function getMetaPixelId(): string | null {
 export function isTrackingEnabled(): boolean {
   return process.env.NEXT_PUBLIC_TRACKING_ENABLED !== "false";
 }
+
+/** Default PostHog Cloud ingestion host (US region). EU users override via env. */
+const POSTHOG_HOST_FALLBACK = "https://us.i.posthog.com";
+
+/**
+ * Returns the PostHog config, or `null` when no project key is set (so the
+ * provider is simply not registered — e.g. in dev before you create a project,
+ * where the console debug provider still shows every event).
+ *
+ * - `key`  — `NEXT_PUBLIC_POSTHOG_KEY` (point at a *dev* project locally).
+ * - `host` — `NEXT_PUBLIC_POSTHOG_HOST` for the PostHog UI/region; ingestion is
+ *            reverse-proxied through `/ingest` (see `next.config.ts`), so this is
+ *            only used as `ui_host`. Defaults to the US cloud.
+ */
+export function getPostHogConfig(): { key: string; host: string } | null {
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  if (!key) return null;
+
+  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST || POSTHOG_HOST_FALLBACK;
+  return { key, host };
+}

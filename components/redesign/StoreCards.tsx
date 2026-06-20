@@ -1,5 +1,6 @@
 import { PRODUCT_LABELS } from "@/lib/constants";
 import type { Store } from "@/lib/types";
+import { tracking } from "@/lib/tracking";
 
 const FORMAT_LABEL: Record<string, string> = {
   SC: "Walmart Supercenter",
@@ -36,6 +37,7 @@ export function StoreCards({ stores }: { stores: Store[] }) {
             target="_blank"
             rel="noopener noreferrer"
             className="rd-cta cd-btn--ghost cd-store__maps"
+            onClick={() => tracking.ctaClick({ cta: "maps_open", section: "zip_finder" })}
           >
             Open in Maps ↗
           </a>

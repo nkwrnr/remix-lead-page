@@ -5,6 +5,7 @@ import { RedesignEmailForm } from "./RedesignEmailForm";
 import { useUtm } from "@/lib/utm";
 import { API_ROUTE } from "@/lib/constants";
 import type { EmailSubmit } from "./useFunnel";
+import { tracking } from "@/lib/tracking";
 
 /**
  * "Next drop" email-capture modal (used by the flavor "Buy it" buttons and the
@@ -77,10 +78,28 @@ export function NextDropModal({ open, onClose }: { open: boolean; onClose: () =>
         }),
       });
       const json = await res.json();
-      if (json.ok) setDone(true);
-      else setError(json.message || "Something went wrong. Please try again.");
+      if (json.ok) {
+        setDone(true);
+        try {
+          tracking.submitEmail({ email, zip: null, path: "skipped", source: "modal" });
+        } catch { /* non-blocking */ }
+      } else {
+        setError(json.message || "Something went wrong. Please try again.");
+        try {
+          tracking.emailSubmitFailed({
+            reason: res.status === 429 ? "rate_limited" : res.status >= 500 ? "server_error" : "validation",
+            email,
+            path: "skipped",
+            source: "modal",
+            zip: null,
+          });
+        } catch { /* non-blocking */ }
+      }
     } catch {
       setError("Network error. Please try again.");
+      try {
+        tracking.emailSubmitFailed({ reason: "network", email, path: "skipped", source: "modal", zip: null });
+      } catch { /* non-blocking */ }
     } finally {
       setSubmitting(false);
     }

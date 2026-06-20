@@ -19,11 +19,17 @@
  */
 
 import type {
+  CtaClickPayload,
+  EmailSubmitFailedPayload,
+  FaqOpenPayload,
   LaunchPayload,
+  ModalPayload,
+  SectionViewPayload,
   SubmitEmailPayload,
   SubmitZipPayload,
   TrackingEvent,
   TrackingProvider,
+  ZipSubmitFailedPayload,
 } from "./types";
 import { TRACKING_EVENTS } from "./types";
 
@@ -115,6 +121,42 @@ export const tracking = {
   submitEmail(payload: SubmitEmailPayload): void {
     dispatch({ name: TRACKING_EVENTS.SUBMIT_EMAIL, payload });
   },
+
+  /** A visitor's zip submission was rejected (invalid/empty). No-op on server. */
+  zipSubmitFailed(payload: ZipSubmitFailedPayload): void {
+    dispatch({ name: TRACKING_EVENTS.ZIP_SUBMIT_FAILED, payload });
+  },
+
+  /** An email capture failed (validation/network/rate-limited/server). Carries
+   *  the attempted address so the lead can be recovered. No-op on server. */
+  emailSubmitFailed(payload: EmailSubmitFailedPayload): void {
+    dispatch({ name: TRACKING_EVENTS.EMAIL_SUBMIT_FAILED, payload });
+  },
+
+  /** A button/link was clicked. `cta` distinguishes which one. No-op on server. */
+  ctaClick(payload: CtaClickPayload): void {
+    dispatch({ name: TRACKING_EVENTS.CTA_CLICK, payload });
+  },
+
+  /** A page section first entered the viewport (fires once). No-op on server. */
+  sectionView(payload: SectionViewPayload): void {
+    dispatch({ name: TRACKING_EVENTS.SECTION_VIEW, payload });
+  },
+
+  /** The next-drop modal opened. No-op on server. */
+  modalOpen(payload: ModalPayload): void {
+    dispatch({ name: TRACKING_EVENTS.MODAL_OPEN, payload });
+  },
+
+  /** The next-drop modal closed. No-op on server. */
+  modalClose(payload: ModalPayload): void {
+    dispatch({ name: TRACKING_EVENTS.MODAL_CLOSE, payload });
+  },
+
+  /** An FAQ accordion item was opened. No-op on server. */
+  faqOpen(payload: FaqOpenPayload): void {
+    dispatch({ name: TRACKING_EVENTS.FAQ_OPEN, payload });
+  },
 } as const;
 
 // ─── Test utilities ──────────────────────────────────────────────────────────
@@ -131,10 +173,16 @@ export function __resetTrackingForTests(): void {
 
 // Re-export types so callers only need one import path.
 export type {
+  CtaClickPayload,
+  EmailSubmitFailedPayload,
+  FaqOpenPayload,
   LaunchPayload,
+  ModalPayload,
+  SectionViewPayload,
   SubmitEmailPayload,
   SubmitZipPayload,
   TrackingEvent,
   TrackingProvider,
+  ZipSubmitFailedPayload,
 };
 export { TRACKING_EVENTS };

@@ -12,6 +12,8 @@ import { findStores } from "@/lib/zip-lookup";
 import { useUtm } from "@/lib/utm";
 import { API_ROUTE } from "@/lib/constants";
 import type { PathType, ProductSlug, Store } from "@/lib/types";
+import { tracking } from "@/lib/tracking";
+import { SectionTracker } from "@/components/tracking/SectionTracker";
 
 type Phase = "idle" | "summoning" | "served" | "unserved" | "success";
 
@@ -58,6 +60,12 @@ export function GenieExperience() {
       if (result.status === "invalid") {
         setZipError("Please enter a valid 5-digit zip code.");
         setLookingUp(false);
+        try {
+          tracking.zipSubmitFailed({
+            reason: zipInput.trim() === "" ? "empty" : "invalid_format",
+            zipAttempted: zipInput,
+          });
+        } catch { /* non-blocking */ }
         return;
       }
       // play the summon animation before the reveal
@@ -70,10 +78,22 @@ export function GenieExperience() {
         setCity(result.stores[0]?.city ?? null);
         setPath("served");
         setPhase("served");
+        try {
+          tracking.submitZip({
+            zip: result.zip,
+            served: true,
+            storeCount: result.stores.length,
+            city: result.stores[0]?.city ?? null,
+            state: result.stores[0]?.state ?? null,
+          });
+        } catch { /* non-blocking */ }
       } else {
         setZip(result.zip);
         setPath("unserved");
         setPhase("unserved");
+        try {
+          tracking.submitZip({ zip: result.zip, served: false });
+        } catch { /* non-blocking */ }
       }
     } catch {
       setZipError("Something went wrong. Please try again.");
@@ -86,6 +106,10 @@ export function GenieExperience() {
   async function handleEmail({ email, consent, website }: EmailSubmit) {
     setSubmitting(true);
     setSubmitError(null);
+    const matchedStore = stores[0]
+      ? `Walmart #${stores[0].storeNumber}, ${stores[0].city}, ${stores[0].state}`
+      : null;
+    const interest = path === "served" ? productInterest(stores) : "unset";
     try {
       const res = await fetch(API_ROUTE, {
         method: "POST",
@@ -96,10 +120,8 @@ export function GenieExperience() {
           website,
           path,
           zip,
-          matchedStore: stores[0]
-            ? `Walmart #${stores[0].storeNumber}, ${stores[0].city}, ${stores[0].state}`
-            : null,
-          productInterest: path === "served" ? productInterest(stores) : "unset",
+          matchedStore,
+          productInterest: interest,
           formLoadedAt: formLoadedAt.current,
           referrer: typeof document !== "undefined" ? document.referrer || null : null,
           pageVariant: "genie_v2",
@@ -111,10 +133,36 @@ export function GenieExperience() {
         }),
       });
       const json = await res.json();
-      if (json.ok) setPhase("success");
-      else setSubmitError(json.message || "Something went wrong. Please try again.");
+      if (json.ok) {
+        setPhase("success");
+        try {
+          tracking.submitEmail({
+            email,
+            zip,
+            path,
+            source: "inline",
+            served: path === "served",
+            matchedStore,
+            productInterest: interest,
+          });
+        } catch { /* non-blocking */ }
+      } else {
+        setSubmitError(json.message || "Something went wrong. Please try again.");
+        try {
+          tracking.emailSubmitFailed({
+            reason: res.status === 429 ? "rate_limited" : res.status >= 500 ? "server_error" : "validation",
+            email,
+            path,
+            source: "inline",
+            zip,
+          });
+        } catch { /* non-blocking */ }
+      }
     } catch {
       setSubmitError("Network error. Please try again.");
+      try {
+        tracking.emailSubmitFailed({ reason: "network", email, path, source: "inline", zip });
+      } catch { /* non-blocking */ }
     } finally {
       setSubmitting(false);
     }
@@ -127,6 +175,7 @@ export function GenieExperience() {
       id="finder"
       className="relative overflow-hidden bg-paper scroll-mt-16"
     >
+      <SectionTracker section="zip_finder" index={0} />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
