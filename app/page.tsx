@@ -221,7 +221,7 @@ export default function ChromeDropPage() {
           {f.phase === "idle" && (
             <>
               <p className="rd-eyebrow">Walmart called dibs</p>
-              <h2 className="cd-chrome cd-chrome--finder" style={{ fontSize: "clamp(1.9rem, 6vw, 3rem)", marginTop: 8 }}>
+              <h2 className="cd-chrome cd-chrome--finder" style={{ fontSize: "clamp(1.3rem, 5.6vw, 2.4rem)", marginTop: 8 }}>
                 Are we in your city?
               </h2>
               <p className="rd-lede" style={{ marginTop: 10, maxWidth: "40ch" }}>

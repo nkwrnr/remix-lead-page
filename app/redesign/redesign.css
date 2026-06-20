@@ -879,9 +879,9 @@
   0%, 100% { background-position: 50% 18%; }
   50%      { background-position: 50% 82%; }
 }
-/* finder headline "Are we in your / city?" — tighten the two-line stack
-   (scoped here so the shared .cd-chrome line-height stays untouched elsewhere) */
-[data-theme="chrome-drop"] .cd-chrome--finder { line-height: 0.82; }
+/* finder headline "Are we in your city?" — sized down to sit on ONE line
+   (nowrap guarantees it; scoped so the shared .cd-chrome stays untouched). */
+[data-theme="chrome-drop"] .cd-chrome--finder { line-height: 0.95; white-space: nowrap; }
 /* holographic word inside the headline (the accent) */
 [data-theme="chrome-drop"] .cd-chrome .cd-holo,
 [data-theme="chrome-drop"] .cd-holoword {

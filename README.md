@@ -19,21 +19,23 @@ cp .env.example .env.local
 npm run dev           # http://localhost:3000
 ```
 
-No external accounts are needed to run or test — leads are stored locally in SQLite.
+No external accounts are needed to run or test locally — dev leads are stored in SQLite.
 
-## Lead backend — local-first & portable
+## Lead backend — ports & adapters
 
-The backend is ports-and-adapters; pick the target with one env var (`LEAD_BACKEND`):
+Pick the destination(s) with one env var (`LEAD_BACKEND`). **Order matters — the first adapter is the
+durable primary (its write must succeed); the rest are best-effort.** `local` is NOT auto-included — it's a
+Node-only SQLite store that can't write on Vercel's read-only filesystem, so use it for dev only.
 
 | Value | Behavior |
 |---|---|
-| `local` (default) | SQLite only (`data/leads.db`). Zero accounts. |
-| `klaviyo+airtable` | Fan out to Klaviyo + Airtable **and** keep a local audit copy. Each remote no-ops safely if its keys are missing. |
+| `local` (dev default) | SQLite only (`data/leads.db`). Zero accounts. |
+| `supabase+klaviyo` (**production, live**) | Supabase Postgres as the durable primary + subscribe to the Klaviyo list (best-effort marketing; no-ops safely if keys missing). |
 
-`/api/subscribe` and the whole UI are unchanged across backends. See `.env.example`
-for the Klaviyo / Airtable / Upstash keys to add when you connect them.
+`/api/subscribe` and the whole UI are unchanged across backends. See `.env.example` for the Supabase /
+Klaviyo / Upstash keys (production also sets `UPSTASH_*` for distributed rate limiting).
 
-- See captured leads: `/admin?token=dev` (dev only; gated by `ADMIN_TOKEN`).
+- See captured leads: `/admin?token=…` (reads the configured backend — Supabase in prod; gated by `ADMIN_TOKEN`).
 - Export to CSV (retailer demand / Klaviyo import): `npm run leads:export`.
 
 ## Data pipeline
@@ -72,9 +74,12 @@ Playwright drives the **installed Google Chrome** (`channel: "chrome"`) — no b
 - **[docs/DESIGN-LOG.md](./docs/DESIGN-LOG.md)** — append-only design/UX/copy decisions.
 - **`.claude/`** — `settings.json` (permissions allowlist + SessionStart orientation & Stop typecheck hooks), the **design-reviewer** subagent, and the **/design-qa** skill.
 
-## Before going live (needs owner input)
+## Live in production
 
-- Klaviyo API key + list id; Airtable token + base — then set `LEAD_BACKEND=klaviyo+airtable`.
-- Domain (ships on `*.vercel.app` until attached) + `NEXT_PUBLIC_SITE_URL`.
+Lead capture is live on **remixlaunch.com**: `LEAD_BACKEND=supabase+klaviyo` (Supabase primary + Klaviyo
+list `X2ayZW`), Upstash rate limiting active. Captured leads in Supabase + Klaviyo; view via `/admin?token=…`.
+
+Still open (needs owner input):
+- Set `NEXT_PUBLIC_SITE_URL` to re-enable the origin guard; optional Airtable mirror (`AIRTABLE_*`).
 - NT Wagner font license (currently using **Fraunces** as a stand-in — swap in `app/layout.tsx`).
 - Authenticated sender domain (SPF/DKIM/DMARC) for deliverability.
