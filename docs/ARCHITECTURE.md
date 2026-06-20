@@ -28,7 +28,8 @@ visitor → zip lookup (client, lib/zip-lookup.ts → public/data/served-zips.js
         → served | unserved | invalid
         → EmailCapture → POST /api/subscribe
             → validate + anti-spam → getLeadStore().save(lead)
-                → LocalStore (SQLite)  [+ Klaviyo + Airtable when configured]
+                → prod: SupabaseStore (primary) + KlaviyoStore (best-effort)
+                → dev:  LocalStore (SQLite)
         → confirmation
 ```
 
@@ -96,7 +97,7 @@ See captured leads at `/admin?token=…` (reads from the configured primary); ex
 
 ## Env vars (`.env.example`)
 
-`LEAD_BACKEND` (default `local`), `LEADS_DB_PATH`, `ADMIN_TOKEN`, `NEXT_PUBLIC_SITE_URL`; for prod: `KLAVIYO_API_KEY`/`KLAVIYO_LIST_ID`, `AIRTABLE_TOKEN`/`AIRTABLE_BASE_ID`/`AIRTABLE_TABLE`, `UPSTASH_REDIS_REST_URL`/`_TOKEN`. Local dev uses `.env.local` (`LEAD_BACKEND=local`).
+`LEAD_BACKEND` (`local` in dev, **`supabase+klaviyo` in prod**), `LEADS_DB_PATH` (dev SQLite only), `ADMIN_TOKEN`, `NEXT_PUBLIC_SITE_URL`. Production also sets: `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SECRET_KEY` (Supabase primary store), `KLAVIYO_API_KEY` + `KLAVIYO_LIST_ID` (marketing fan-out), `UPSTASH_REDIS_REST_URL`/`_TOKEN` (distributed rate limiter). Optional: `AIRTABLE_*`. Local dev uses `.env.local` (`LEAD_BACKEND=local`); flip to `supabase+klaviyo` locally to exercise the prod path.
 
 ## Tests
 
@@ -104,6 +105,14 @@ See captured leads at `/admin?token=…` (reads from the configured primary); ex
 - **E2E (Playwright)** — `tests/e2e/funnel.spec.ts` (v1) + `tests/e2e/genie.spec.ts` (v2): drive both flows and **assert rows land in SQLite** (`data/leads.e2e.db`). Config in `playwright.config.ts` boots its own dev server on port 3100 with `LEAD_BACKEND=local`.
 - Run: `npm test`, `npm run test:e2e`. If you change test-pinned copy strings, update the specs in the same commit (see [COPY.md](./COPY.md)).
 
-## Going live (later)
+## Production status (live)
 
-Set `LEAD_BACKEND=klaviyo+airtable` + keys, add Upstash, license/swap the display font (see DESIGN.md), pick a domain + set `NEXT_PUBLIC_SITE_URL`, authenticate the sender domain (SPF/DKIM/DMARC), deploy to Vercel. The switch is config-only — no code change.
+Live on **remixlaunch.com** (Vercel, auto-deploy from `main`). Lead capture is **live and verified**:
+`LEAD_BACKEND=supabase+klaviyo` → every submit lands in **Supabase** (durable primary, `leads` table) and
+subscribes to the **Klaviyo** list `X2ayZW` ("Email Optin - Remix Launch Page", single opt-in, best-effort).
+Distributed rate limiting via **Upstash Redis** is active. Lead viewer at `/admin?token=…` reads the
+configured primary (Supabase in prod).
+
+Still optional/later: license + swap the display font (see DESIGN.md), set `NEXT_PUBLIC_SITE_URL` to
+re-enable the origin guard, authenticate the sender domain (SPF/DKIM/DMARC), add Airtable if a spreadsheet
+mirror is wanted. All config-only — no code change.

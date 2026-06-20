@@ -37,7 +37,7 @@ npm run qa:genie     # screenshot all "/genie" states → qa-screenshots/genie/
 npm run leads:export # dump local leads → CSV
 ```
 
-Captured leads (local SQLite): **/admin?token=dev**.
+Captured leads: **/admin?token=…** (reads the configured backend — Supabase in prod, local SQLite in dev; dev token `dev`). Live leads also in the Supabase Table Editor + the Klaviyo list.
 
 ## Conventions
 
@@ -57,8 +57,8 @@ Captured leads (local SQLite): **/admin?token=dev**.
 
 ## Gotchas
 
-- **Form anti-spam:** 2-second time-trap (submit too fast = silent drop), 5-per-10-min per-IP rate limit (restart `npm run dev` to clear `429`).
-- Lead backend defaults to **`LEAD_BACKEND=local`** (SQLite, no accounts). Klaviyo/Airtable are config-only env vars later.
+- **Form anti-spam:** 2-second time-trap (submit too fast = silent drop), 5-per-10-min per-IP rate limit. In prod this uses **Upstash Redis** (distributed, works across Vercel instances); locally it's in-memory (restart `npm run dev` to clear `429`).
+- **Lead backend:** dev = **`LEAD_BACKEND=local`** (SQLite, no accounts); **prod = `supabase+klaviyo`** (LIVE) — Supabase is the durable primary (better-sqlite3 can't run on Vercel's read-only FS), Klaviyo is best-effort marketing fan-out to list `X2ayZW`. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). The official Klaviyo MCP is wired at local scope for marketing ops.
 - Test-pinned copy strings in e2e tests (list in `docs/COPY.md`) — if you reword them, update test specs in the same change.
 - The Chrome Drop lab snapshot at `/redesign/chrome-drop` is a frozen reference. The live `/` evolves independently; they are not synced.
 
